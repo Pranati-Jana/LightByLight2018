@@ -46,7 +46,8 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   if (doElectrons_) {
     gsfElectronsCollection_ = consumes<edm::View<reco::GsfElectron>>(ps.getParameter<edm::InputTag>("gsfElectronLabel"));
     beamSpotToken_          = consumes<reco::BeamSpot>(ps.getParameter <edm::InputTag>("beamSpot"));
-    conversionsToken_       = consumes< reco::ConversionCollection >(ps.getParameter<edm::InputTag>("conversions"));
+    //conversionsToken_       = consumes< reco::ConversionCollection >(ps.getParameter<edm::InputTag>("conversions"));
+    conversionsToken_       = consumes< reco::ConversionCollection >(ps.getParameter<edm::InputTag>("allConversions"));
     doVID_                  = ps.getParameter<bool>("doElectronVID");
     if (doVID_) {
       eleVetoIdMapToken_      = consumes<edm::ValueMap<bool> >(ps.getParameter<edm::InputTag>("electronVetoID"));
@@ -112,7 +113,12 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
     PixelClustersCollection_  = consumes<edmNew::DetSetVector<SiPixelCluster>>(edm::InputTag("siPixelClusters"));
     PixelRecHitsCollection_   = consumes<edmNew::DetSetVector<SiPixelRecHit>>(edm::InputTag("siPixelRecHits"));
   }  //Date:22/09/2022
-  
+  //AllConversions Collection///////
+  //doAllTracks_                = ps.getParameter<bool>("doAllTracks"); 
+  //if (doAllTracks_){
+  //  allConversions_ = consume<reco::ConversionCollection>(ps.getParameter<edm::InputTag>("allConversions"));
+ // } 
+  //////
 
   // initialize output TTree
   edm::Service<TFileService> fs;
@@ -122,7 +128,7 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   tree_->Branch("event",  &event_);
   tree_->Branch("lumis",  &lumis_);
   tree_->Branch("isData", &isData_);
-  //Adding Vertex info//Date: 27/12/2022,Pranati
+  //Adding Vertex //Pranati
   tree_->Branch("nVtx",   &nVtx_);
   tree_->Branch("xVtx",   &xVtx_);
   tree_->Branch("yVtx",   &yVtx_);
@@ -668,7 +674,7 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
     tree_->Branch("CaloTower_et",          &CaloTower_et_);
     tree_->Branch("CaloTower_eta",         &CaloTower_eta_);
     tree_->Branch("CaloTower_phi",         &CaloTower_phi_);
-    //Date:15/11/2022
+    
     tree_->Branch("CaloTower_ieta",         &CaloTower_ieta_);
     tree_->Branch("CaloTower_iphi",         &CaloTower_iphi_);
   }
@@ -677,13 +683,18 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
      tree_->Branch("nTrackerHits",   &nTrackerHits_);
      tree_->Branch("nPixelClusters", &nPixelClusters_);
      tree_->Branch("nPixelRecHits",  &nPixelRecHits_);
-  }   //Date:22/09/2022
+  }   
+  //AllConversions collection
+ // if(doAllTracks_){
+   //  tree_->Branch("nAllTrk",    &nAllTrk_);     
+  //}
+  ///////
 }
 
 void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
   // cleanup from previous event
-  // Clean up vtx from previous event, Date:27/12/2022, Pranati
+  // Clean up vtx from previous event Pranati
   nVtx_ = 0;
   xVtx_                 .clear();
   yVtx_                 .clear();
@@ -752,7 +763,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     eleTrkNormalizedChi2_ .clear();
     eleTrkValidHits_      .clear();
     eleTrkLayers_         .clear();
-    //Date:19/08/2022 for px,py,pz
+    // for px,py,pz
     elePx_                .clear();
     elePy_                .clear();
     elePz_                .clear();
@@ -1120,7 +1131,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     muInnerPt_            .clear();
     muInnerPtErr_         .clear();
     muInnerEta_           .clear();
-    //muontrkPhi,16/08/2022
+    //muontrkPhi,
     muInnerPhi_           .clear();
     //
 
@@ -1147,7 +1158,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
 
   if (doGeneralTracks_){
     nTrk_ = 0;
-    //Date:19/08/2022, for px,py,pz
+    // for px,py,pz
     trkPx_             .clear();
     trkPy_             .clear();
     trkPz_             .clear();
@@ -1203,7 +1214,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     CaloTower_et_         .clear();
     CaloTower_eta_        .clear();
     CaloTower_phi_        .clear();
-    //Date:15/11/2022
+    
     CaloTower_ieta_        .clear();
     CaloTower_iphi_        .clear();
   }
@@ -1213,6 +1224,11 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     nPixelClusters_ = 0;
     nPixelRecHits_  = 0;
   }
+  //AllConversion Collection///
+//  if(doAllTracks_){
+  //  nAllTrk_  = 0;
+ // }
+  //////
 
   run_    = e.id().run();
   event_  = e.id().event();
@@ -1236,8 +1252,16 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   edm::Handle<std::vector<reco::Vertex> > vtxHandle;
   e.getByToken(vtxCollection_, vtxHandle);
 
+  // best-known primary vertex coordinates
+  // /////////////////////////////////Comment out to implement 2015 vtx info
+  //reco::Vertex pv(math::XYZPoint(0, 0, -999), math::Error<3>::type());
+  //for (const auto& v : *vtxHandle)
+    //if (!v.isFake()) {
+      //pv = v;
+      //break;
+   // }
 /////////////////////////////////////////
-// Vtx info
+//Try to implement vtx info like in 2015
   reco::Vertex pv(math::XYZPoint(0, 0, -999), math::Error<3>::type());
   for (const auto& v : *vtxHandle)
     if (!v.isFake()) {
@@ -1245,6 +1269,8 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
       xVtx_    .push_back(v.x());
       yVtx_    .push_back(v.y());
       zVtx_    .push_back(v.z());
+      //std::cout << "nVtx" << nVtx.size() << std::endl;//Pranati
+      std::cout << "xVtx" << v.x() << std::endl;//Pranati
       nVtx_++;
       break;
     }
@@ -1275,8 +1301,8 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   if (doGeneralTracks_) fillGeneralTracks(e, es, pv);
   if (doPixelTracks_) fillPixelTracks(e, es, pv);
   if (doCaloTower_) fillCaloTower(e, es, pv);
-  if (doTrackerHits_) fillTrackerHits(e);  //Date:22/09/2022
-
+  if (doTrackerHits_) fillTrackerHits(e);  
+ // if (doAllTracks_) fillAllTracks(e, es, pv);//AllConversions collection
   tree_->Fill();
 }
 
@@ -1476,10 +1502,14 @@ void ggHiNtuplizer::fillElectrons(const edm::Event& e, const edm::EventSetup& es
 
   edm::Handle<edm::View<reco::GsfElectron> > gsfElectronsHandle;
   e.getByToken(gsfElectronsCollection_, gsfElectronsHandle);
-
-  edm::Handle<reco::ConversionCollection> conversions;
-  e.getByToken(conversionsToken_, conversions);
-
+  //To Add allConversion 
+  //edm::Handle<reco::ConversionCollection> conversions;
+ // e.getByToken(conversionsToken_, conversions);
+  //////
+  //AddAllConversions//Pranati
+  edm::Handle<reco::ConversionCollection> allConversions;
+  e.getByToken(conversionsToken_, allConversions);
+  ////////
   edm::Handle<reco::BeamSpot> theBeamSpot;
   e.getByToken(beamSpotToken_, theBeamSpot);
 
@@ -1531,7 +1561,7 @@ void ggHiNtuplizer::fillElectrons(const edm::Event& e, const edm::EventSetup& es
     eleTrkNormalizedChi2_.push_back(ele->gsfTrack()->normalizedChi2());
     eleTrkValidHits_     .push_back(ele->gsfTrack()->numberOfValidHits());
     eleTrkLayers_        .push_back(ele->gsfTrack()->hitPattern().trackerLayersWithMeasurement());
-    //px,py,pz
+    //date:19/08/2022,px,py,pz
     elePx_               .push_back(ele->px());
     elePy_               .push_back(ele->py());
     elePz_               .push_back(ele->pz());
@@ -1586,7 +1616,7 @@ void ggHiNtuplizer::fillElectrons(const edm::Event& e, const edm::EventSetup& es
     }
 
     bool passConvVeto = !ConversionTools::hasMatchedConversion(
-      *ele, conversions, theBeamSpot->position());
+      *ele, allConversions, theBeamSpot->position());
     eleConvVeto_.push_back( (int) passConvVeto );
 
     //Initialize with nonphysical values
@@ -2382,7 +2412,7 @@ void ggHiNtuplizer::fillCaloTower(const edm::Event& e, const edm::EventSetup& es
        CaloTower_et_   .push_back(calo->et());
        CaloTower_phi_  .push_back(calo->phi());
        CaloTower_eta_  .push_back(calo->eta());
-       //Date:15/11/2022
+       //
        CaloTower_ieta_  .push_back(calo->ieta());
        CaloTower_iphi_  .push_back(calo->iphi());
     
@@ -2390,7 +2420,7 @@ void ggHiNtuplizer::fillCaloTower(const edm::Event& e, const edm::EventSetup& es
   }
 } // calo tower loop
 
-
+// siPixel module is not prseent in GK's FSR sample
 void ggHiNtuplizer::fillTrackerHits(const edm::Event& event)
 {
   /// dE/dx hit info
