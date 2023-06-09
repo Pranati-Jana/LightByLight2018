@@ -32,6 +32,9 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   doRecHitsEB_            = ps.getParameter<bool>("doRecHitsEB");
   doRecHitsEE_            = ps.getParameter<bool>("doRecHitsEE");
   doPfIso_                = ps.getParameter<bool>("doPfIso");
+  //AllConversions Collection
+  doAllTracks_            = ps.getParameter<bool>("doAllTracks");
+  //
   removePhotonPfIsoFootprint_ = ps.getParameter<bool>("removePhotonPfIsoFootprint");
   if (doGenParticles_) {
     genPileupCollection_    = consumes<std::vector<PileupSummaryInfo>>(ps.getParameter<edm::InputTag>("pileupCollection"));
@@ -46,8 +49,7 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   if (doElectrons_) {
     gsfElectronsCollection_ = consumes<edm::View<reco::GsfElectron>>(ps.getParameter<edm::InputTag>("gsfElectronLabel"));
     beamSpotToken_          = consumes<reco::BeamSpot>(ps.getParameter <edm::InputTag>("beamSpot"));
-    //conversionsToken_       = consumes< reco::ConversionCollection >(ps.getParameter<edm::InputTag>("conversions"));
-    conversionsToken_       = consumes< reco::ConversionCollection >(ps.getParameter<edm::InputTag>("allConversions"));
+    conversionsToken_       = consumes< reco::ConversionCollection >(ps.getParameter<edm::InputTag>("conversions"));
     doVID_                  = ps.getParameter<bool>("doElectronVID");
     if (doVID_) {
       eleVetoIdMapToken_      = consumes<edm::ValueMap<bool> >(ps.getParameter<edm::InputTag>("electronVetoID"));
@@ -113,13 +115,13 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
     PixelClustersCollection_  = consumes<edmNew::DetSetVector<SiPixelCluster>>(edm::InputTag("siPixelClusters"));
     PixelRecHitsCollection_   = consumes<edmNew::DetSetVector<SiPixelRecHit>>(edm::InputTag("siPixelRecHits"));
   }  //Date:22/09/2022
-  //AllConversions Collection///////
+  
+//AllConversions Collection///////
   //doAllTracks_                = ps.getParameter<bool>("doAllTracks"); 
-  //if (doAllTracks_){
-  //  allConversions_ = consume<reco::ConversionCollection>(ps.getParameter<edm::InputTag>("allConversions"));
- // } 
-  //////
-
+if (doAllTracks_){
+        allConversionsCollectionToken_ = consumes<reco::ConversionCollection>(ps.getParameter<edm::InputTag>("allConversions"));
+        } 
+//         //////
   // initialize output TTree
   edm::Service<TFileService> fs;
   tree_ = fs->make<TTree>("EventTree", "Event data");
@@ -128,7 +130,7 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   tree_->Branch("event",  &event_);
   tree_->Branch("lumis",  &lumis_);
   tree_->Branch("isData", &isData_);
-  //Adding Vertex //Pranati
+  //Adding Vertex info//Date: 27/12/2022,Pranati
   tree_->Branch("nVtx",   &nVtx_);
   tree_->Branch("xVtx",   &xVtx_);
   tree_->Branch("yVtx",   &yVtx_);
@@ -674,7 +676,7 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
     tree_->Branch("CaloTower_et",          &CaloTower_et_);
     tree_->Branch("CaloTower_eta",         &CaloTower_eta_);
     tree_->Branch("CaloTower_phi",         &CaloTower_phi_);
-    
+    //Date:15/11/2022
     tree_->Branch("CaloTower_ieta",         &CaloTower_ieta_);
     tree_->Branch("CaloTower_iphi",         &CaloTower_iphi_);
   }
@@ -683,18 +685,23 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
      tree_->Branch("nTrackerHits",   &nTrackerHits_);
      tree_->Branch("nPixelClusters", &nPixelClusters_);
      tree_->Branch("nPixelRecHits",  &nPixelRecHits_);
-  }   
-  //AllConversions collection
- // if(doAllTracks_){
-   //  tree_->Branch("nAllTrk",    &nAllTrk_);     
-  //}
-  ///////
+  }   //Date:22/09/2022
+
+//AllConversions collection
+  if(doAllTracks_){
+      tree_->Branch("nAllTrk",    &nAllTrk_);     
+      }
+//        ///////
+
 }
+
+
+
 
 void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
   // cleanup from previous event
-  // Clean up vtx from previous event Pranati
+  // Clean up vtx from previous event, Date:27/12/2022, Pranati
   nVtx_ = 0;
   xVtx_                 .clear();
   yVtx_                 .clear();
@@ -763,7 +770,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     eleTrkNormalizedChi2_ .clear();
     eleTrkValidHits_      .clear();
     eleTrkLayers_         .clear();
-    // for px,py,pz
+    //Date:19/08/2022 for px,py,pz
     elePx_                .clear();
     elePy_                .clear();
     elePz_                .clear();
@@ -1131,7 +1138,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     muInnerPt_            .clear();
     muInnerPtErr_         .clear();
     muInnerEta_           .clear();
-    //muontrkPhi,
+    //muontrkPhi,16/08/2022
     muInnerPhi_           .clear();
     //
 
@@ -1158,7 +1165,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
 
   if (doGeneralTracks_){
     nTrk_ = 0;
-    // for px,py,pz
+    //Date:19/08/2022, for px,py,pz
     trkPx_             .clear();
     trkPy_             .clear();
     trkPz_             .clear();
@@ -1214,7 +1221,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     CaloTower_et_         .clear();
     CaloTower_eta_        .clear();
     CaloTower_phi_        .clear();
-    
+    //Date:15/11/2022
     CaloTower_ieta_        .clear();
     CaloTower_iphi_        .clear();
   }
@@ -1224,11 +1231,12 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     nPixelClusters_ = 0;
     nPixelRecHits_  = 0;
   }
-  //AllConversion Collection///
-//  if(doAllTracks_){
-  //  nAllTrk_  = 0;
- // }
-  //////
+
+//AllConversion Collection///
+  if(doAllTracks_){
+    nAllTrk_  = 0;
+   }
+//     //////
 
   run_    = e.id().run();
   event_  = e.id().event();
@@ -1301,8 +1309,10 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   if (doGeneralTracks_) fillGeneralTracks(e, es, pv);
   if (doPixelTracks_) fillPixelTracks(e, es, pv);
   if (doCaloTower_) fillCaloTower(e, es, pv);
-  if (doTrackerHits_) fillTrackerHits(e);  
- // if (doAllTracks_) fillAllTracks(e, es, pv);//AllConversions collection
+  if (doTrackerHits_) fillTrackerHits(e);  //Date:22/09/2022
+  //AllConversions
+  if (doAllTracks_) fillAllTracks(e, es, pv);
+  //
   tree_->Fill();
 }
 
@@ -1502,14 +1512,10 @@ void ggHiNtuplizer::fillElectrons(const edm::Event& e, const edm::EventSetup& es
 
   edm::Handle<edm::View<reco::GsfElectron> > gsfElectronsHandle;
   e.getByToken(gsfElectronsCollection_, gsfElectronsHandle);
-  //To Add allConversion 
-  //edm::Handle<reco::ConversionCollection> conversions;
- // e.getByToken(conversionsToken_, conversions);
-  //////
-  //AddAllConversions//Pranati
-  edm::Handle<reco::ConversionCollection> allConversions;
-  e.getByToken(conversionsToken_, allConversions);
-  ////////
+
+  edm::Handle<reco::ConversionCollection> conversions;
+  e.getByToken(conversionsToken_, conversions);
+
   edm::Handle<reco::BeamSpot> theBeamSpot;
   e.getByToken(beamSpotToken_, theBeamSpot);
 
@@ -1616,7 +1622,7 @@ void ggHiNtuplizer::fillElectrons(const edm::Event& e, const edm::EventSetup& es
     }
 
     bool passConvVeto = !ConversionTools::hasMatchedConversion(
-      *ele, allConversions, theBeamSpot->position());
+      *ele, conversions, theBeamSpot->position());
     eleConvVeto_.push_back( (int) passConvVeto );
 
     //Initialize with nonphysical values
@@ -2210,7 +2216,7 @@ void ggHiNtuplizer::fillMuons(const edm::Event& e, const edm::EventSetup& es, re
     if (!(mu.isPFMuon() || mu.isGlobalMuon() || mu.isTrackerMuon())) continue;
     //if (!(mu.isStandAloneMuon())) continue;
 
-    //px,py,pz  
+    //,px,py,pz  
     muPx_    .push_back(mu.px());
     muPy_    .push_back(mu.py());
     muPz_    .push_back(mu.pz());
@@ -2282,7 +2288,7 @@ void ggHiNtuplizer::fillMuons(const edm::Event& e, const edm::EventSetup& es, re
       muInnerPt_     .push_back(innMu->pt());
       muInnerPtErr_  .push_back(innMu->ptError());
       muInnerEta_    .push_back(innMu->eta());
-      //muonTrkPhi
+      //muonTrkPhi,16/08/2022
       muInnerPhi_    .push_back(innMu->phi());     
       //
       muTrkLayers_   .push_back(innMu->hitPattern().trackerLayersWithMeasurement());
@@ -2412,7 +2418,7 @@ void ggHiNtuplizer::fillCaloTower(const edm::Event& e, const edm::EventSetup& es
        CaloTower_et_   .push_back(calo->et());
        CaloTower_phi_  .push_back(calo->phi());
        CaloTower_eta_  .push_back(calo->eta());
-       //
+       //Date:15/11/2022
        CaloTower_ieta_  .push_back(calo->ieta());
        CaloTower_iphi_  .push_back(calo->iphi());
     
@@ -2447,6 +2453,20 @@ void ggHiNtuplizer::fillTrackerHits(const edm::Event& event)
   for(auto recHit = PixelRecHitsHandle->begin(); recHit != PixelRecHitsHandle->end(); ++recHit){
     nPixelRecHits_++;
   }
+}
+//AllConversions
+void ggHiNtuplizer::fillAllTracks(const edm::Event& e, const edm::EventSetup& es, reco::Vertex& pv)
+{
+
+  edm::Handle<reco::ConversionCollection> allConversions;
+  e.getByToken(conversionsToken_, allConversions);
+
+for (auto allTrk = allConversions->begin(); allTrk != allConversions->end(); ++allTrk) {
+
+ nAllTrk_++;
+
+}
+
 }
 
 /// TrackerHits loop end here
