@@ -48,15 +48,17 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    void fillGenParticles (const edm::Event&);
    void fillGenPileupInfo(const edm::Event&);
    void fillSC           (const edm::Event&);
-   void fillTrackerHits  (const edm::Event&);
+   void fillTrackerHits  (const edm::Event&);// Date: 22/09/2022; As siPixel module not present in FSR sample produced by GK
    void fillElectrons    (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
-   
+   //Date:22/08/2022, ont adding photons for data
    void fillPhotons      (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
    void fillMuons        (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
    void fillGeneralTracks(const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
    void fillPixelTracks  (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
    void fillCaloTower    (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
-
+   //AllConversions collection
+   void fillAllTracks    (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
+   //
    // Et and pT sums
    float getGenCalIso(edm::Handle<std::vector<reco::GenParticle> >&, reco::GenParticleCollection::const_iterator, float dRMax, bool removeMu, bool removeNu);
    float getGenTrkIso(edm::Handle<std::vector<reco::GenParticle> >&, reco::GenParticleCollection::const_iterator, float dRMax);
@@ -64,7 +66,7 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    // switches
    bool doGenParticles_;
    bool doElectrons_;
-   
+   //Date:22/08/2022, not adding photons for data
    bool doPhotons_;
    bool doMuons_;
    bool runOnParticleGun_;
@@ -82,6 +84,9 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    bool doPixelTracks_;
    bool doCaloTower_;
    bool doTrackerHits_;
+   //AllConversions Collection
+   bool doAllTracks_;
+   //
 
 
    // handles to collections of objects
@@ -100,6 +105,7 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    edm::EDGetTokenT<std::vector<reco::Vertex> >         vtxCollection_;
    edm::EDGetTokenT<double> rhoToken_;
    edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
+   //edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
    edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
    edm::EDGetTokenT<edm::View<reco::PFCandidate> >    pfCollection_;
 
@@ -116,7 +122,9 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster>>    PixelClustersCollection_;
    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelRecHit>>     PixelRecHitsCollection_;
    edm::EDGetTokenT<std::vector<reco::Track>>                DisplacedTracksCollection_;
-
+   //AllConversions Collection
+   edm::EDGetTokenT<reco::ConversionCollection>   allConversionsCollectionToken_;
+   //
    const CaloGeometry *geo;
    const CaloTopology* topo;
    const TransientTrackBuilder* tb;
@@ -131,7 +139,7 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    UInt_t         lumis_;
    Bool_t         isData_;
    Float_t        rho_;
-   //Vtx info/
+   //Vtx info//Date:27/12/2022
    Int_t          nVtx_;
    std::vector<float>  xVtx_;
    std::vector<float>  yVtx_;
@@ -656,9 +664,10 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    Int_t nPixelClusters_;
    Int_t nPixelRecHits_;
 
-   //Date:22/08/2022,ZDC 
-
    
+   //reco::AllConversions collection
+   Int_t         nAllTrk_;
+   // 
 
 };
 
