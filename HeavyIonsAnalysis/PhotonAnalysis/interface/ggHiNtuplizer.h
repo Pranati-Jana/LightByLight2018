@@ -7,6 +7,7 @@
 #include "DataFormats/Common/interface/View.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHit.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
+#include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/HIPhotonIsolation.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
@@ -57,8 +58,8 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    void fillPixelTracks  (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
    void fillCaloTower    (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
    //AllConversions collection
-   void fillAllTracks    (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
-   //
+ //  void fillConversionTracks    (const edm::Event&, const edm::EventSetup&, reco::Vertex& pv);
+   void fillConversionTracks    (const edm::Event&, const edm::EventSetup&);
    // Et and pT sums
    float getGenCalIso(edm::Handle<std::vector<reco::GenParticle> >&, reco::GenParticleCollection::const_iterator, float dRMax, bool removeMu, bool removeNu);
    float getGenTrkIso(edm::Handle<std::vector<reco::GenParticle> >&, reco::GenParticleCollection::const_iterator, float dRMax);
@@ -85,7 +86,8 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    bool doCaloTower_;
    bool doTrackerHits_;
    //AllConversions Collection
-   bool doAllTracks_;
+   //bool doConversion_;i
+   bool doConversions_;
    //
 
 
@@ -106,6 +108,7 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    edm::EDGetTokenT<double> rhoToken_;
    edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
    //edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
+   //
    edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
    edm::EDGetTokenT<edm::View<reco::PFCandidate> >    pfCollection_;
 
@@ -123,7 +126,8 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelRecHit>>     PixelRecHitsCollection_;
    edm::EDGetTokenT<std::vector<reco::Track>>                DisplacedTracksCollection_;
    //AllConversions Collection
-   edm::EDGetTokenT<reco::ConversionCollection>   allConversionsCollectionToken_;
+   //edm::EDGetTokenT<reco::ConversionCollection>   allConversionsCollectionToken_;
+   edm::EDGetTokenT<reco::ConversionCollection> conversionToken_;
    //
    const CaloGeometry *geo;
    const CaloTopology* topo;
@@ -667,6 +671,7 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    
    //reco::AllConversions collection
    Int_t         nAllTrk_;
+   std::vector<float> tracksdz_; 
    // 
 
 };
