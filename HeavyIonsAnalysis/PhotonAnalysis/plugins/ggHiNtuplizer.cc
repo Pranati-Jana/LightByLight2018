@@ -17,6 +17,8 @@
 #include "HeavyIonsAnalysis/PhotonAnalysis/interface/ggHiNtuplizer.h"
 #include "HeavyIonsAnalysis/PhotonAnalysis/src/pfIsoCalculator.h"
 
+#include "FWCore/Framework/interface/MakerMacros.h"
+
 ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   effectiveAreas_( (ps.getParameter<edm::FileInPath>("effAreasConfigFile")).fullPath() )
 {
@@ -33,7 +35,8 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   doRecHitsEE_            = ps.getParameter<bool>("doRecHitsEE");
   doPfIso_                = ps.getParameter<bool>("doPfIso");
   //AllConversions Collection
-  doAllTracks_            = ps.getParameter<bool>("doAllTracks");
+  //doConversion_           = ps.getParameter<bool>("doConversion");
+  doConversions_          = ps.getParameter<bool>("doConversions");
   //
   removePhotonPfIsoFootprint_ = ps.getParameter<bool>("removePhotonPfIsoFootprint");
   if (doGenParticles_) {
@@ -118,9 +121,13 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   
 //AllConversions Collection///////
   //doAllTracks_                = ps.getParameter<bool>("doAllTracks"); 
-if (doAllTracks_){
-        allConversionsCollectionToken_ = consumes<reco::ConversionCollection>(ps.getParameter<edm::InputTag>("allConversions"));
-        } 
+//if (doConversion_){
+  //      conversionsToken_ = consumes<reco::ConversionCollection>(ps.getParameter<edm::InputTag>("Conversions"));
+  //      } 
+  if (doConversions_) {
+    conversionToken_ = consumes<reco::ConversionCollection>(ps.getParameter<edm::InputTag>("conversions"));
+}
+ 
 //         //////
   // initialize output TTree
   edm::Service<TFileService> fs;
@@ -688,9 +695,13 @@ if (doAllTracks_){
   }   //Date:22/09/2022
 
 //AllConversions collection
-  if(doAllTracks_){
-      tree_->Branch("nAllTrk",    &nAllTrk_);     
-      }
+ // if(doConversion_){
+   //   tree_->Branch("nAllTrk",    &nAllTrk_);     
+     // }
+  if (doConversions_){
+      tree_->Branch("nAllTRk",    &nAllTrk_);
+      tree_->Branch("tracksdz",  &tracksdz_);
+  }
 //        ///////
 
 }
@@ -1233,9 +1244,14 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   }
 
 //AllConversion Collection///
-  if(doAllTracks_){
-    nAllTrk_  = 0;
-   }
+ // if(doConversion_){
+   // nAllTrk_  = 0;
+ // }
+ if(doConversions_){
+    nAllTrk_ = 0;
+    tracksdz_             .clear();
+ }
+ //
 //     //////
 
   run_    = e.id().run();
@@ -1311,8 +1327,8 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   if (doCaloTower_) fillCaloTower(e, es, pv);
   if (doTrackerHits_) fillTrackerHits(e);  //Date:22/09/2022
   //AllConversions
-  if (doAllTracks_) fillAllTracks(e, es, pv);
-  //
+ // if (doConversion_) fillConversionTracks(e, es, pv);
+  if (doConversions_) fillConversionTracks(e, es);
   tree_->Fill();
 }
 
@@ -2216,7 +2232,7 @@ void ggHiNtuplizer::fillMuons(const edm::Event& e, const edm::EventSetup& es, re
     if (!(mu.isPFMuon() || mu.isGlobalMuon() || mu.isTrackerMuon())) continue;
     //if (!(mu.isStandAloneMuon())) continue;
 
-    //,px,py,pz  
+    //Date:19/08/2022,px,py,pz  
     muPx_    .push_back(mu.px());
     muPy_    .push_back(mu.py());
     muPz_    .push_back(mu.pz());
@@ -2271,7 +2287,7 @@ void ggHiNtuplizer::fillMuons(const edm::Event& e, const edm::EventSetup& es, re
       muInnerPt_     .push_back(-99);
       muInnerPtErr_  .push_back(-99);
       muInnerEta_    .push_back(-99);
-      //muonTrkPhi
+      //muonTrkPhi,16/08/2022
       muInnerPhi_    .push_back(-99);    
       //
       muTrkLayers_   .push_back(-99);
@@ -2281,7 +2297,7 @@ void ggHiNtuplizer::fillMuons(const edm::Event& e, const edm::EventSetup& es, re
     } else {
       muInnerD0_     .push_back(innMu->dxy(pv.position()));
       muInnerDz_     .push_back(innMu->dz(pv.position()));
-      //print innerdz
+      //date:29/08/20222,print innerdz
       std::cout << "MuonInnerDz:" << (innMu->dz(pv.position())) << std::endl;     
       muInnerD0Err_  .push_back(innMu->dxyError());
       muInnerDzErr_  .push_back(innMu->dzError());
@@ -2426,7 +2442,7 @@ void ggHiNtuplizer::fillCaloTower(const edm::Event& e, const edm::EventSetup& es
   }
 } // calo tower loop
 
-// siPixel module is not prseent in GK's FSR sample
+//Date:22/09/2022; siPixel module is not prseent in GK's FSR sample
 void ggHiNtuplizer::fillTrackerHits(const edm::Event& event)
 {
   /// dE/dx hit info
@@ -2454,20 +2470,35 @@ void ggHiNtuplizer::fillTrackerHits(const edm::Event& event)
     nPixelRecHits_++;
   }
 }
-//AllConversions
-void ggHiNtuplizer::fillAllTracks(const edm::Event& e, const edm::EventSetup& es, reco::Vertex& pv)
-{
+//AllConbversion
+//void ggHiNtuplizer::fillConversionTracks(const edm::Event& e, const edm::EventSetup& es, reco::Vertex& pv)
+//{
 
-  edm::Handle<reco::ConversionCollection> allConversions;
-  e.getByToken(conversionsToken_, allConversions);
+  //edm::Handle<reco::ConversionCollection> conversions;
+ // e.getByToken(conversionsToken_, conversions);
 
-for (auto allTrk = allConversions->begin(); allTrk != allConversions->end(); ++allTrk) {
+//for (auto allTrk = conversions->begin(); allTrk != conversions->end(); ++allTrk) {
 
- nAllTrk_++;
+ //nAllTrk_++;
 
-}
+//}
 
-}
+//}
+ void ggHiNtuplizer::fillConversionTracks(const edm::Event& e, const edm::EventSetup& es)
+ { 
+    edm::Handle<reco::ConversionCollection> conversions;
+    e.getByToken(conversionToken_, conversions);
+   // for (const auto& tracks : *conversions) {
+     for (auto allTrk = conversions->begin(); allTrk != conversions->end(); ++allTrk) { 
+       //const reco::TrackRefVector tracks = conversion.tracks();
+     //   std::cout << "Tracksdz=" << allTrk.dz(); 
+      //  std::cout << "TracksP=" << allTrk.pairMomentum(); 
+        std::cout << "Conversion" << std::endl;
+        tracksdz_             .push_back(allTrk->dz());       
+        nAllTrk_++;
+     }
+
+ } 
 
 /// TrackerHits loop end here
 DEFINE_FWK_MODULE(ggHiNtuplizer);
