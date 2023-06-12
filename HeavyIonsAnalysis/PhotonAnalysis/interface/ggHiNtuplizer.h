@@ -671,7 +671,17 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    
    //reco::AllConversions collection
    Int_t         nAllTrk_;
-   std::vector<float> tracksdz_; 
+   Int_t         nTracks_;
+   std::vector<float> tracksdz_;
+   std::vector<float> tracksEoverP_;
+   std::vector<float> trackspairMomentum_;
+   std::vector<float> trackspairInvariantMass_;
+   std::vector<float> tracksPin_;
+   std::vector<float> tracksPout_;
+   std::vector<float> tracksInnerPosition_;  
+   std::vector<int>   tracksisConverted_;
+   std::vector<float> tracksconversionVertex_; 
+   std::vector<int>   tracksquality_;
    // 
 
 };
