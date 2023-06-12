@@ -701,15 +701,45 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
   if (doConversions_){
       tree_->Branch("nAllTRk",    &nAllTrk_);
       tree_->Branch("nTracks",    &nTracks_);
-      tree_->Branch("tracksdz",  &tracksdz_);
-      tree_->Branch("tracksEoverP",  &tracksEoverP_);
-      tree_->Branch("trackspairMomentum",  &trackspairMomentum_);
+      tree_->Branch("tracksdz",  &tracks_dz_);
+      tree_->Branch("tracksEoverP",  &tracks_EoverP_);
+      tree_->Branch("tracksdxy",     &tracks_dxy_);
+      tree_->Branch("trackslxy",     &tracks_lxy_);
+      tree_->Branch("trackslz",      &tracks_lz_);
+      tree_->Branch("trackszOfPrimaryVertexFromTracks",   &tracks_zOfPrimaryVertexFromTracks_);
+      tree_->Branch("tracksEoverPrefittedTracks",  &tracks_EoverPrefittedTracks_);
+      tree_->Branch("tracksdistOfMinimumApproach",  &tracks_distOfMinimumApproach_);
+      tree_->Branch("tracks_dPhiTracksAtVtx",  &tracks_dPhiTracksAtVtx_);
+      tree_->Branch("tracks_dPhiTracksAtEcal",  &tracks_dPhiTracksAtEcal_);
+      tree_->Branch("tracks_dEtaTracksAtEcal",  &tracks_dEtaTracksAtEcal_);
+      tree_->Branch("tracks_pairCotThetaSeparation",  &tracks_pairCotThetaSeparation_);
+      tree_->Branch("tracks_MVAout",  &tracks_MVAout_);
+      tree_->Branch("tracksconversionVertexX",  &tracks_conversionVertexX_);  
+      tree_->Branch("tracksconversionVertexY",  &tracks_conversionVertexY_);  
+      tree_->Branch("tracksconversionVertexZ",  &tracks_conversionVertexZ_);  
+      tree_->Branch("tracksconversionVertextracks",  &tracks_conversionVertex_tracks_);  
+  
+    //  tree_->Branch();
+    //  tree_->Branch();
+
+
+
+
+      tree_->Branch("trackspairMomentum_px",  &tracks_pairMomentum_px_);
+      tree_->Branch("trackspairMomentum_py",  &tracks_pairMomentum_py_);
+      tree_->Branch("trackspairMomentum_pz",  &tracks_pairMomentum_pz_);
+
       tree_->Branch("trackspairInvariantMass",  &trackspairInvariantMass_);
+
+      tree_->Branch("tracksrefittedpairMomentum_pt",  &tracks_refitted_pairMomentum_pt_);
+      tree_->Branch("tracksrefittedpairMomentum_eta",  &tracks_refitted_pairMomentum_eta_);
+      tree_->Branch("tracksrefittedpairMomentum_phi",  &tracks_refitted_pairMomentum_phi_);
+      //
       tree_->Branch("tracksPin",  &tracksPin_);
       tree_->Branch("tracksPout",  &tracksPout_);
       tree_->Branch("tracksInnerPosition",  &tracksInnerPosition_);
       tree_->Branch("tracksisConverted",    &tracksisConverted_);
-      tree_->Branch("tracksconversionVertex",  &tracksconversionVertex_);
+   //   tree_->Branch("tracksconversionVertex",  &tracksconversionVertex_);
       tree_->Branch("tracksquality",   &tracksquality_);
   }
 //        ///////
@@ -1259,10 +1289,34 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
  // }
  if(doConversions_){
     nAllTrk_ = 0;
-    nTracks_ = 0;
-    tracksdz_             .clear();
-    tracksEoverP_         .clear();
-    trackspairMomentum_         .clear();
+    nTracks_               .clear();
+    tracks_dz_             .clear();
+    tracks_EoverP_         .clear();
+    tracks_dxy_            .clear();
+    tracks_lxy_            .clear();
+    tracks_lz_             .clear();
+    tracks_zOfPrimaryVertexFromTracks_   .clear();
+    tracks_EoverPrefittedTracks_         .clear();
+    tracks_distOfMinimumApproach_        .clear();    
+    tracks_dPhiTracksAtVtx_              .clear();
+    tracks_dPhiTracksAtEcal_             .clear();
+    tracks_dEtaTracksAtEcal_             .clear();
+    tracks_pairCotThetaSeparation_       .clear();
+    tracks_MVAout_                       .clear();
+    tracks_conversionVertexX_     .clear();
+    tracks_conversionVertexY_     .clear();
+    tracks_conversionVertexZ_     .clear();
+    tracks_conversionVertex_tracks_     .clear();
+    
+
+
+    tracks_pairMomentum_px_         .clear();
+    tracks_pairMomentum_py_         .clear();
+    tracks_pairMomentum_pz_         .clear();
+    tracks_refitted_pairMomentum_pt_         .clear();
+    tracks_refitted_pairMomentum_eta_         .clear();
+    tracks_refitted_pairMomentum_phi_         .clear();
+
    //std::vector<float> trackspairMomentum_;
    //std::vector<float> trackspairMomentum_;
     trackspairInvariantMass_    .clear();
@@ -1270,7 +1324,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     tracksPout_           .clear();
     tracksInnerPosition_  .clear();
     tracksisConverted_          .clear();
-    tracksconversionVertex_     .clear();
+   // tracksconversionVertex_     .clear();
     tracksquality_              .clear();
  }
  //
@@ -2517,16 +2571,40 @@ void ggHiNtuplizer::fillTrackerHits(const edm::Event& event)
      //   std::cout << "Tracksdz=" << allTrk.dz(); 
       //  std::cout << "TracksP=" << allTrk.pairMomentum(); 
         std::cout << "Conversion" << std::endl;
-        tracksdz_            .push_back(allTrk->dz());  
-        tracksEoverP_        .push_back(allTrk->EoverP()); 
-        trackspairMomentum_        .push_back(allTrk->pairMomentum());    
+        nTracks_              .push_back(allTrk->nTracks());
+        tracks_dz_            .push_back(allTrk->dz());  
+        tracks_EoverP_        .push_back(allTrk->EoverP()); 
+        tracks_dxy_           .push_back(allTrk->dxy());
+        tracks_lxy_           .push_back(allTrk->lxy());
+        tracks_lz_            .push_back(allTrk->lz());
+        tracks_zOfPrimaryVertexFromTracks_  .push_back(allTrk->zOfPrimaryVertexFromTracks());
+        tracks_EoverPrefittedTracks_    .push_back(allTrk->EoverPrefittedTracks());
+        tracks_distOfMinimumApproach_   .push_back(allTrk->distOfMinimumApproach());
+        tracks_dPhiTracksAtVtx_         .push_back(allTrk->dPhiTracksAtVtx());
+        //tracks_dPhiTracksAtEcal_        .push_back(allTrk->dPhiTracksAtEcal());
+        //tracks_dEtaTracksAtEcal_        .push_back(allTrk->dEtaTracksAtEcal());
+        tracks_pairCotThetaSeparation_  .push_back(allTrk->pairCotThetaSeparation());
+        tracks_MVAout_                  .push_back(allTrk->MVAout());
+        tracks_conversionVertexX_       .push_back(allTrk->conversionVertex().position().x());
+        tracks_conversionVertexY_       .push_back(allTrk->conversionVertex().position().y());
+        tracks_conversionVertexZ_       .push_back(allTrk->conversionVertex().position().z());
+        //tracks_conversionVertex_tracks_       .push_back(allTrk->conversionVertex().tracks_.size());
+        const math::XYZTLorentzVectorF refittedPair4Momentum();
+
+        tracks_refitted_pairMomentum_pt_         .push_back(allTrk-> refittedPair4Momentum().pt());       
+        tracks_refitted_pairMomentum_eta_        .push_back(allTrk-> refittedPair4Momentum().eta());       
+        tracks_refitted_pairMomentum_phi_        .push_back(allTrk-> refittedPair4Momentum().phi());       
+        //
+        const math::XYZVectorF pairMomentum();
+        tracks_pairMomentum_px_         .push_back(allTrk-> pairMomentum().X());
+        tracks_pairMomentum_py_         .push_back(allTrk-> pairMomentum().Y());
+        tracks_pairMomentum_pz_         .push_back(allTrk-> pairMomentum().Z());
+
+
+ 
         trackspairInvariantMass_   .push_back(allTrk->pairInvariantMass());
-  //      tracksPin_           .push_back(allTrk->tracksPin());
-        //tracksPout_          .push_back(allTrk->tracksPout()); 
-        //tracksInnerPosition_ .push_back(allTrk->tracksInnersPosition());
         tracksisConverted_         .push_back(allTrk->isConverted());
-        //tracksconversionVertex_    .push_back(allTrk->conversionVertex());
-       // tracksquality_             .push_back(allTrk->ConversionQuality());
+        //tracksquality_             .push_back(allTrk->quality("ConversionQuality 0 "));
         nAllTrk_++;
      }
 
