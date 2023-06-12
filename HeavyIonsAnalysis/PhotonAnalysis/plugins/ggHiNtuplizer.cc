@@ -1263,6 +1263,8 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
     tracksdz_             .clear();
     tracksEoverP_         .clear();
     trackspairMomentum_         .clear();
+   //std::vector<float> trackspairMomentum_;
+   //std::vector<float> trackspairMomentum_;
     trackspairInvariantMass_    .clear();
     tracksPin_            .clear();
     tracksPout_           .clear();
@@ -2508,22 +2510,23 @@ void ggHiNtuplizer::fillTrackerHits(const edm::Event& event)
  { 
     edm::Handle<reco::ConversionCollection> conversions;
     e.getByToken(conversionToken_, conversions);
-   // for (const auto& tracks : *conversions) {
-     for (auto allTrk = conversions->begin(); allTrk != conversions->end(); ++allTrk) { 
-       //const reco::TrackRefVector tracks = conversion.tracks();
+    //for (const auto& allTrk : *conversions) {
+   //  for (auto allTrk = conversions->begin(); allTrk != conversions->end(); ++allTrk) { 
+     for (reco::ConversionCollection::const_iterator  allTrk = conversions->begin(); allTrk != conversions->end(); ++allTrk) { 
+       //const reco::TrackRefVector tracks = conversions.tracks();
      //   std::cout << "Tracksdz=" << allTrk.dz(); 
       //  std::cout << "TracksP=" << allTrk.pairMomentum(); 
         std::cout << "Conversion" << std::endl;
         tracksdz_            .push_back(allTrk->dz());  
         tracksEoverP_        .push_back(allTrk->EoverP()); 
-       // pairMomentum_        .push_back(allTrk->pairMomentum());    
+        trackspairMomentum_        .push_back(allTrk->pairMomentum());    
         trackspairInvariantMass_   .push_back(allTrk->pairInvariantMass());
-       // tracksPin_           .push_back(allTrk->theTrackPin());
-       // tracksPout_          .push_back(allTrk->tracksPout()); 
+  //      tracksPin_           .push_back(allTrk->tracksPin());
+        //tracksPout_          .push_back(allTrk->tracksPout()); 
         //tracksInnerPosition_ .push_back(allTrk->tracksInnersPosition());
         tracksisConverted_         .push_back(allTrk->isConverted());
         //tracksconversionVertex_    .push_back(allTrk->conversionVertex());
-        //tracksquality_             .push_back(allTrk->quality());
+       // tracksquality_             .push_back(allTrk->ConversionQuality());
         nAllTrk_++;
      }
 
