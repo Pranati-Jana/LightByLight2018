@@ -674,10 +674,11 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    Int_t         nTracks_;
    std::vector<float> tracksdz_;
    std::vector<float> tracksEoverP_;
-   std::vector<float> trackspairMomentum_;
+   //std::vector<float> trackspairMomentum_pt_;
+   std::vector<math::XYZVectorF> trackspairMomentum_;
    std::vector<float> trackspairInvariantMass_;
-   std::vector<float> tracksPin_;
-   std::vector<float> tracksPout_;
+   std::vector<math::XYZVectorF> tracksPin_;
+   std::vector<math::XYZVectorF> tracksPout_;
    std::vector<float> tracksInnerPosition_;  
    std::vector<int>   tracksisConverted_;
    std::vector<float> tracksconversionVertex_; 
