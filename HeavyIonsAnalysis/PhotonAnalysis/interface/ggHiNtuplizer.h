@@ -671,7 +671,7 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    
    //reco::AllConversions collection
    Int_t         nAllTrk_;
-   std::vector<Int_t>         nTracks_;
+   std::vector<Int_t>         nConversions_;
    std::vector<float> conversions_dz_;
    std::vector<float> conversions_EoverP_;
    std::vector<float> conversions_dxy_;
