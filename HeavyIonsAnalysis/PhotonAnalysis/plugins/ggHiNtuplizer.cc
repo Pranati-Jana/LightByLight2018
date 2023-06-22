@@ -700,7 +700,7 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) :
      // }
   if (doConversions_){
       tree_->Branch("nAllTRk",    &nAllTrk_);
-      tree_->Branch("nTracks",    &nTracks_);
+      tree_->Branch("nConversions",    &nConversions_);
       tree_->Branch("conversions_dz",  &conversions_dz_);
       tree_->Branch("conevrsions_EoverP",  &conversions_EoverP_);
       tree_->Branch("conversions_dxy",     &conversions_dxy_);
@@ -1298,7 +1298,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
  // }
  if(doConversions_){
     nAllTrk_ = 0;
-    nTracks_               .clear();
+    nConversions_               .clear();
     conversions_dz_             .clear();
     conversions_EoverP_         .clear();
     conversions_dxy_            .clear();
@@ -2588,7 +2588,7 @@ void ggHiNtuplizer::fillTrackerHits(const edm::Event& event)
        //const reco::TrackRefVector tracks = conversions.tracks();
      //   std::cout << "Tracksdz=" << allTrk.dz(); 
         std::cout << "Conversion" << std::endl;
-        nTracks_              .push_back(allTrk->nTracks());
+        nConversions_              .push_back(allTrk->nTracks());
         conversions_dz_            .push_back(allTrk->dz());  
         conversions_EoverP_        .push_back(allTrk->EoverP()); 
         conversions_dxy_           .push_back(allTrk->dxy());
