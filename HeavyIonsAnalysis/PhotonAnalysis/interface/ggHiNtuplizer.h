@@ -672,42 +672,50 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    //reco::AllConversions collection
    Int_t         nAllTrk_;
    std::vector<Int_t>         nTracks_;
-   std::vector<float> tracks_dz_;
-   std::vector<float> tracks_EoverP_;
-   std::vector<float> tracks_dxy_;
-   std::vector<float> tracks_lxy_;
-   std::vector<float> tracks_lz_;
-   std::vector<float> tracks_zOfPrimaryVertexFromTracks_;
-   std::vector<float> tracks_EoverPrefittedTracks_;
-   std::vector<float> tracks_distOfMinimumApproach_; 
-   std::vector<float> tracks_dPhiTracksAtVtx_;
-   std::vector<float> tracks_dPhiTracksAtEcal_;
-   std::vector<float> tracks_dEtaTracksAtEcal_;
-   std::vector<float> tracks_pairCotThetaSeparation_;
-   std::vector<float> tracks_MVAout_;
-   std::vector<float> tracks_conversionVertexX_;   
-   std::vector<float> tracks_conversionVertexY_;  
-   std::vector<float> tracks_conversionVertexZ_;   
-   std::vector<float> tracks_conversionVertex_tracks_;   
+   std::vector<float> conversions_dz_;
+   std::vector<float> conversions_EoverP_;
+   std::vector<float> conversions_dxy_;
+   std::vector<float> conversions_lxy_;
+   std::vector<float> conversions_lz_;
+   std::vector<float> conversions_zOfPrimaryVertexFromTracks_;
+   std::vector<float> conversions_EoverPrefittedTracks_;
+   std::vector<float> conversions_distOfMinimumApproach_; 
+   std::vector<float> conversions_dPhiTracksAtVtx_;
+   std::vector<float> conversions_dPhiTracksAtEcal_;
+   std::vector<float> conversions_dEtaTracksAtEcal_;
+   std::vector<float> conversions_pairCotThetaSeparation_;
+   std::vector<float> conversions_MVAout_;
+   std::vector<float> conversions_VertexX_;   
+   std::vector<float> conversions_VertexY_;  
+   std::vector<float> conversions_VertexZ_;   
+   std::vector<float> conversions_conversionVertex_tracks_;   
    
    
  
    //std::vector<float> trackspairMomentum_pt_;
-   std::vector<float> tracks_pairMomentum_px_;
-   std::vector<float> tracks_pairMomentum_py_;
-   std::vector<float> tracks_pairMomentum_pz_;
-   std::vector<float> tracks_refitted_pairMomentum_pt_;
-   std::vector<float> tracks_refitted_pairMomentum_eta_;
-   std::vector<float> tracks_refitted_pairMomentum_phi_;
+   std::vector<float> conversions_pairMomentum_px_;
+   std::vector<float> conversions_pairMomentum_py_;
+   std::vector<float> conversions_pairMomentum_pz_;
+   std::vector<float> conversions_refitted_pairMomentum_pt_;
+   std::vector<float> conversions_refitted_pairMomentum_eta_;
+   std::vector<float> conversions_refitted_pairMomentum_phi_;
    //
-   std::vector<float> trackspairInvariantMass_;
-   std::vector<float> tracksPin_;
-   std::vector<float> tracksPout_;
-   std::vector<float> tracksInnerPosition_;  
-   std::vector<int>   tracksisConverted_;
+   std::vector<float> conversions_pairInvariantMass_;
+   std::vector<int>   isConverted_;
    std::vector<float> tracksconversionVertex_; 
-   std::vector<int>   tracksquality_;
-   // 
+   //
+   std::vector<int>   conversions_quality_generalTracksOnly_; 
+   std::vector<int>   conversions_quality_arbitratedEcalSeeded_; 
+   std::vector<int>   conversions_quality_arbitratedMerged_; 
+   std::vector<int>   conversions_quality_arbitratedMergedEcalGeneral_; 
+   std::vector<int>   conversions_quality_gsfTracksOpenOnly_; 
+   std::vector<int>   conversions_quality_highPurity_; 
+   std::vector<int>   conversions_quality_highEfficiency_; 
+   std::vector<int>   conversions_quality_ecalMatched1Track_; 
+   std::vector<int>   conversions_quality_ecalMatched2Track_; 
+   //
+   std::vector<int>   conversions_algo_; 
+
 
 };
 
