@@ -1,3 +1,9 @@
+//this is a script to make response matrix from LbyL MC 
+// Background subtracted from data
+// Data unfolded
+// All numbers (cross-section, luminosity for data to get cross-section is in nano barn
+// Created by Ruchi Chudasama
+///////////////////////////////////////////////////////////////////////////////////////
 #if !(defined(__CINT__) || defined(__CLING__)) || defined(__ACLIC__)
 #include <iostream>
 #include <fstream>
@@ -29,8 +35,8 @@
 #include "ReadLbyLTree.C"
 
 const int nSample = 1;
-//const char *sample[nSample]={"Data","QED_SC","QED_SL"};
-const char *sample[nSample]={"LbL"};
+//const char *Sample[nSample]={"Data","QED_SC","QED_SL"};
+const char *Sample[nSample]={"LbL"};
 
 void make_canvas(TCanvas *&);
 void make_canvas_ratio(TCanvas *&);
@@ -39,41 +45,31 @@ void make_hist_ratio(TH1D *&,Color_t, int) ;
 
 //const double luminosity       = 1635.123139823; // μb^-1
 const double luminosity       = 1;
+//const double luminosity       = 1.6722;
 //const double luminosity       = 1639.207543; // μb^-1
-const double nEventsGeneratedSL = 66750000; // older number with less files 63398400; //starlight
-//const double xsecGeneratedSL    = 7920; // μb, starlight
-const double xsecGeneratedSL    = 7920000; // nb, starlight
-
-const double nEventsGeneratedSC = 67810000; // older number with less files 67262800 superchic 
-//const double xsecGeneratedSC    = 8827.220; // μb
-const double xsecGeneratedSC    = 8827220; // nb
-const double purity = 0.96; 
-double scaleFactorsSC = 0.85 *  // NEE    21.12.2021
-                        0.93 *      // CHE  21.12.2021
-                        pow(0.976, 2)* // electron reco+ID 21.12.2021
-                        0.866 *      // HF veto
-                       1.008;       // L1 EG trigger
-
-double scaleFactorsSL = 0.85 *  // NEE    21.12.2021
-  0.93 *      // CHE  21.12.2021
-  pow(0.976, 2)* // electron reco+ID 21.12.2021
-  0.866 *      // HF veto
-  1.008;       // L1 EG trigger
+//const double luminosity       = 1.639207543; // μb^-1
 
 
+double scaleFactorPhoton = 0.8477 *  //0.85// NEE    21.12.2021
+  0.9322 *      //0.93// CHE  21.12.2021
+  pow(0.9771, 2)* //1.048// Photon  reco+ID 21.12.2021
+  0.8643 *      //0.866// HF veto
+  1.0006;       //1.008// L1 EG trigger
 
-double lumiNormSC = xsecGeneratedSC*luminosity*purity*scaleFactorsSC/nEventsGeneratedSC;
-double lumiNormSL = xsecGeneratedSL*luminosity*purity*scaleFactorsSL/nEventsGeneratedSL;
+//const double xsecGeneratedLbLSC    = 2.59; // μb Superchic
+const double xsecGeneratedLbLSC    = 2590; // nb Superchic
+const double nEventsGeneratedLbLSC = 466000;  //Superchic
+double norm_LbLSC = scaleFactorPhoton*xsecGeneratedLbLSC*luminosity/nEventsGeneratedLbLSC;  //31.12.21 (SF = 1.048, took the square here). 
 
-//const double xsecGeneratedLbL    = 2.59; // μb
-const double xsecGeneratedLbL    = 2590; // nb
-const double nEventsGeneratedLbL = 466000; 
-//double norm_exgg = 0.83*0.99*xsecGeneratedLbL*luminosity/nEventsGeneratedLbL; 
-double norm_exgg = 1.09*xsecGeneratedLbL*luminosity/nEventsGeneratedLbL;  //31.12.21 (SF = 1.048, took the square here). 
+//const double xsecGeneratedLbLMG    = 0.1406; // μb Madgraph David
+const double xsecGeneratedLbLMG    = 140.6; // nb Madgraph David
+const double nEventsGeneratedLbLMG = 788069; //Madgraph David
+double norm_LbLMG = scaleFactorPhoton*xsecGeneratedLbLMG*luminosity/nEventsGeneratedLbLMG;  //31.12.21 (SF = 1.048, took the square here). 
+
 
 void printOutput(TH1D *hist);
 
-const double wt[nSample] = {norm_exgg};
+double wt[nSample] = {norm_LbLSC};
 float getAcoBinSF(float acop);
 
 
@@ -86,14 +82,28 @@ void drawText(const char *text, float xp, float yp, int size){
   tex->SetNDC();
   tex->Draw();
 }
+
+
+const int nRapbins=5;
+//double Rapbin[nRapbins]={-2.5,-0.75,0.75,2.5};
+double Rapbin[nRapbins]={-2.2,-0.29,0.5,1.0,2.2};
+const int nRapbin= sizeof(Rapbin)/sizeof(double) - 1;
+
 const int nMassbins=4;
-double Massbin[nMassbins]={5.0,8.0,11.0,16.0};
+//double Massbin[nMassbins]={5.0,7.0,10.0,30.0};
+//double Massbin[nMassbins]={5.0,7.5,10.5,16.0};
+//double Massbin[nMassbins]={5.0,7.3,13.0,16.0};
+//double Massbin[nMassbins]={5.0,7.0,10.0,16.0};
+double Massbin[nMassbins]={5.0,7.3,13.0,17.0};
+//double Massbin[nMassbins]={5.0,7.3,13.0,16.0};
 const int nMassbin= sizeof(Massbin)/sizeof(double) - 1;
 
 
 TH1D* subtractBkg(TH1D *hdata, TH1D *hqed, TH1D *hcep, const char* name, int nbins, float xmin, float xmax);
 
 TH1D* getXSecHist(TH1D *hist, const char* name, int nbins, float xmin, float xmax, float lumi);
+TH1D* getInvXSecHist(TH1D *hist, const char* name, float lumi);
+TH1D* getRapXSecHist(TH1D *hist, const char* name, float lumi);
 
 TCanvas* PlotHistsAndRatio(TCanvas* , TH1D* , TH1D*, TH1D*, double , double , double , double , double , double , const char *, bool); 
 void makeUnfold(int method=1){
@@ -106,19 +116,23 @@ void makeUnfold(int method=1){
   char MethID1[100]; 
   if(method==1){
         
-      sprintf(MethID1,"Bayes_unfo");
+      //sprintf(MethID1,"Bayes_unfo");
     } 
   if(method==2){
     
-      sprintf(MethID1,"Svd_unfo ");
+      //sprintf(MethID1,"Svd_unfo ");
     }
   if(method==3){
     
-      sprintf(MethID1,"BinByBin_unfo");
+      //sprintf(MethID1,"BinByBin_unfo");
     }
 
+  string mc_name = "SC";
 
-  TFile *outf= new TFile(Form("unfolding_histograms_%s.root",MethID1),"recreate");  
+
+  bool absRap = false;
+
+  TFile *outf= new TFile(Form("unfolding_histograms_Bayes_%s.root",mc_name.c_str()),"recreate");  
   
   TChain *lbyl[nSample];
   
@@ -136,53 +150,66 @@ void makeUnfold(int method=1){
   int i =0;
   //for (int i = 0; i < nSample; i++){
     lbyl[i] = new TChain("output_tree");
-    //lbyl[i]->Add(Form("%s_eta2p2_GenInfo.root",sample[i]));
-    lbyl[i]->Add("../eta2p2/lbyl_diphoton_genInfo.root");
+    lbyl[i]->Add(Form("RootFile/lbylSC_diphoton_genInfo.root"));
+
+
     
-    hdipho_Pt[i]    = new TH1D(Form("hdipho_Pt%s", sample[i]),"",10,0,2);
-    hdipho_Rapidity[i]   = new TH1D(Form("hdipho_Rapidity%s",sample[i]),"",2,0,1.6);
-    hdipho_Invmass[i]   = new TH1D(Form("hdipho_Invmass%s",sample[i]),"",nMassbin, Massbin);
-    hAcoplanarity[i]   = new TH1D(Form("hAcoplanarity%s",sample[i]),"",50,0,0.1);
+    hdipho_Pt[i]    = new TH1D(Form("hdipho_Pt%s", Sample[i]),"",5,0,1);
+    hdipho_Rapidity[i]   = new TH1D(Form("hdipho_Rapidity%s",Sample[i]),"",nRapbin, Rapbin);
+   // hdipho_Rapidity[i]   = new TH1D(Form("hdipho_Rapidity%s",Sample[i]),"",2,0,2.2);
+    hdipho_Invmass[i]   = new TH1D(Form("hdipho_Invmass%s",Sample[i]),"",nMassbin, Massbin);
+    hAcoplanarity[i]   = new TH1D(Form("hAcoplanarity%s",Sample[i]),"",50,0,0.1);
     
-    hdipho_GenPt[i]         = new TH1D(Form("hdipho_GenPt%s", sample[i]),"",10,0,2);
-    hdipho_GenRapidity[i]   = new TH1D(Form("hdipho_GenRapidity%s",sample[i]),"",2,0,1.6);
-    hdipho_GenInvmass[i]          = new TH1D(Form("hdipho_GenInvmass%s",sample[i]),"",nMassbin, Massbin);
+    hdipho_GenPt[i]         = new TH1D(Form("hdipho_GenPt%s", Sample[i]),"",5,0,1);
+    hdipho_GenRapidity[i]   = new TH1D(Form("hdipho_GenRapidity%s",Sample[i]),"",nRapbin, Rapbin);
+   // hdipho_GenRapidity[i]   = new TH1D(Form("hdipho_GenRapidity%s",Sample[i]),"",2,0,2.2);
+    hdipho_GenInvmass[i]          = new TH1D(Form("hdipho_GenInvmass%s",Sample[i]),"",nMassbin, Massbin);
     
-    hdipho_RecoGenPt[i]         = new TH2D(Form("hdipho_RecoGenPt%s", sample[i]),"",10,0,2,10,0,2);
-    hdipho_RecoGenRapidity[i]   = new TH2D(Form("hdipho_RecoGenRapidity%s",sample[i]),"",2,0,1.6,2,0,1.6);
-    hRecoGenInvmass[i]          = new TH2D(Form("hRecoGenInvmass%s",sample[i]),"",nMassbin, Massbin,nMassbin, Massbin);
+    hdipho_RecoGenPt[i]         = new TH2D(Form("hdipho_RecoGenPt%s", Sample[i]),"",5,0,1,5,0,1);
+    hdipho_RecoGenRapidity[i]   = new TH2D(Form("hdipho_RecoGenRapidity%s",Sample[i]),"",nRapbin, Rapbin,nRapbin, Rapbin);
+   // hdipho_RecoGenRapidity[i]   = new TH2D(Form("hdipho_RecoGenRapidity%s",Sample[i]),"",2,0,2.2,2,0,2.2);
+    hRecoGenInvmass[i]          = new TH2D(Form("hRecoGenInvmass%s",Sample[i]),"",nMassbin, Massbin,nMassbin, Massbin);
 
 
   // ===================   Cross section histograms   ======================     
 
-  TH1D* hGenPt_xSec              = new TH1D("hGenPt_xSec", "Pt gen MC",10,0,2);
-  TH1D* hGenRap_xSec             = new TH1D("hGenRap_xSec","Rap gen MC",2,0,1.6);
+  TH1D* hGenPt_xSec              = new TH1D("hGenPt_xSec", "Pt gen MC",5,0,1);
+  TH1D* hGenRap_xSec             = new TH1D("hGenRap_xSec","Rap gen MC",nRapbin, Rapbin);
+ //TH1D* hGenRap_xSec             = new TH1D("hGenRap_xSec","Rap gen MC",2,0,2.2);
   TH1D* hGenInvmass_xSec         = new TH1D("hGenInvmass_xSec","Invmass gen MC",nMassbin, Massbin);
 
-  TH1D* hRecoMCPt_xSec              = new TH1D("hRecoMCPt_xSec", "Pt gen MC",10,0,2);
-  TH1D* hRecoMCRap_xSec             = new TH1D("hRecoMCRap_xSec","Rap gen MC",2,0,1.6);
+  TH1D* hRecoMCPt_xSec              = new TH1D("hRecoMCPt_xSec", "Pt gen MC",5,0,1);
+  TH1D* hRecoMCRap_xSec             = new TH1D("hRecoMCRap_xSec","Rap gen MC",nRapbin, Rapbin);
+ // TH1D* hRecoMCRap_xSec             = new TH1D("hRecoMCRap_xSec","Rap gen MC",2,0,2.2);
   TH1D* hRecoMCInvmass_xSec         = new TH1D("hRecoMCInvmass_xSec","Invmass gen MC",nMassbin, Massbin);
 
-  TH1D* hRecoDataPt_xSec              = new TH1D("hRecoDataPt_xSec", "Pt gen MC",10,0,2);
-  TH1D* hRecoDataRap_xSec             = new TH1D("hRecoDataRap_xSec","Rap gen MC",2,0,1.6);
+  TH1D* hRecoDataPt_xSec              = new TH1D("hRecoDataPt_xSec", "Pt gen MC",5,0,1);
+  TH1D* hRecoDataRap_xSec             = new TH1D("hRecoDataRap_xSec","Rap gen MC",nRapbin, Rapbin);
+  //TH1D* hRecoDataRap_xSec             = new TH1D("hRecoDataRap_xSec","Rap gen MC",2,0,2.2);
   TH1D* hRecoDataInvmass_xSec         = new TH1D("hRecoDataInvmass_xSec","Invmass gen MC",nMassbin, Massbin);
 
 
-  TH1D* hUnfoMCPt_xSec              = new TH1D("hUnfoMCPt_xSec", "Pt gen MC",10,0,2);
-  TH1D* hUnfoMCRap_xSec             = new TH1D("hUnfoMCRap_xSec","Rap gen MC",2,0,1.6);
+  TH1D* hUnfoMCPt_xSec              = new TH1D("hUnfoMCPt_xSec", "Pt gen MC",5,0,1);
+  TH1D* hUnfoMCRap_xSec             = new TH1D("hUnfoMCRap_xSec","Rap gen MC",nRapbin, Rapbin);
+  //TH1D* hUnfoMCRap_xSec             = new TH1D("hUnfoMCRap_xSec","Rap gen MC",2,0,2.2);
   TH1D* hUnfoMCInvmass_xSec         = new TH1D("hUnfoMCInvmass_xSec","Invmass gen MC",nMassbin, Massbin);
 
-  TH1D* hUnfoDataPt_xSec              = new TH1D("hUnfoDataPt_xSec", "Pt gen MC",10,0,2);
-  TH1D* hUnfoDataRap_xSec             = new TH1D("hUnfoDataRap_xSec","Rap gen MC",2,0,1.6);
+  TH1D* hUnfoDataPt_xSec              = new TH1D("hUnfoDataPt_xSec", "Pt gen MC",5,0,1);
+  TH1D* hUnfoDataRap_xSec             = new TH1D("hUnfoDataRap_xSec","Rap gen MC",nRapbin, Rapbin);
+  //TH1D* hUnfoDataRap_xSec             = new TH1D("hUnfoDataRap_xSec","Rap gen MC",2,0,2.2);
   TH1D* hUnfoDataInvmass_xSec         = new TH1D("hUnfoDataInvmass_xSec","Invmass gen MC",nMassbin, Massbin);
 
 
 
 
 
-    RooUnfoldResponse responsePt (hdipho_Pt[i], hdipho_GenPt[i]);
+/*    RooUnfoldResponse responsePt (hdipho_Pt[i], hdipho_GenPt[i]);
     RooUnfoldResponse responseRapidity (hdipho_Rapidity[i], hdipho_GenRapidity[i]);
     RooUnfoldResponse responseInvmass (hdipho_Invmass[i], hdipho_GenInvmass[i]);
+ */   
+    RooUnfoldResponse responsePt (hdipho_Pt[i], hdipho_GenPt[i],hdipho_RecoGenPt[i]);
+    RooUnfoldResponse responseRapidity (hdipho_Rapidity[i], hdipho_GenRapidity[i],hdipho_RecoGenRapidity[i]);
+    RooUnfoldResponse responseInvmass (hdipho_Invmass[i], hdipho_GenInvmass[i],hRecoGenInvmass[i]);
 
     cout << "file " << lbyl[i]->GetEntries()  << endl;
     ReadLbyLTree  lbylR(lbyl[i]);
@@ -202,19 +229,19 @@ void makeUnfold(int method=1){
      
 
       // "===================      Fill gen Info here ======================     
-      if(abs(lbylR.gen_Eta1) > 2.2 || abs(lbylR.gen_Eta1) > 2.2 || lbylR.gen_Pt1 < 2.0 || lbylR.gen_Pt2 < 2.0 || lbylR.gen_diPho_M < 5) continue;
+      if(abs(lbylR.gen_Eta1) > 2.2 || abs(lbylR.gen_Eta2) > 2.2 || lbylR.gen_Pt1 < 2.5 || lbylR.gen_Pt2 < 2.5 || lbylR.gen_diPho_M < 5) continue;
       if(abs(lbylR.gen_diPho_Rapidity) > 2.2) continue;
-
+      
       hdipho_GenPt[i]->Fill(lbylR.gen_diPho_Pt,wt[i]);
-      hdipho_GenRapidity[i]->Fill(abs(lbylR.gen_diPho_Rapidity),wt[i]);
+      if(absRap)hdipho_GenRapidity[i]->Fill(abs(lbylR.gen_diPho_Rapidity),wt[i]);
+      if(!absRap)hdipho_GenRapidity[i]->Fill(lbylR.gen_diPho_Rapidity,wt[i]);
       hdipho_GenInvmass[i]->Fill(lbylR.gen_diPho_M,wt[i]);
-
 
       // ===================   Apply analysis cuts on reco MC ======================           
       bool isPassing = lbylR.phoSwissCross_1 < 0.95 && lbylR.phoSwissCross_2 <  0.95
 		        && lbylR.ok_neuexcl == 1 && lbylR.ok_chexcl_goodtracks == 1 && lbylR.ok_chexcl_goodelectrons == 1 
-		        && lbylR.vSum_M > 5 && lbylR.vSum_Pt < 2 
- 			&& abs(lbylR.phoEta_1) < 2.2 && abs(lbylR.phoEta_2) < 2.2 && lbylR.phoEt_1 > 2.0 && lbylR.phoEt_2 > 2.0		
+		        && lbylR.vSum_M > 5 && lbylR.vSum_Pt < 1 
+ 			&& abs(lbylR.phoEta_1) < 2.2 && abs(lbylR.phoEta_2) < 2.2 && lbylR.phoEt_1 > 2.5 && lbylR.phoEt_2 > 2.5		
 		 	&& lbylR.pho_acop < 0.01;
 			
       if(lbylR.ok_trigger == 1) { //trigger 
@@ -233,26 +260,31 @@ void makeUnfold(int method=1){
 	if(lbylR.pho_acop > 0.01) continue; //acop*/
 	
 	hdipho_Pt[i]->Fill(lbylR.vSum_Pt,wt[i]);
-	hdipho_Rapidity[i]->Fill(abs(lbylR.vSum_Rapidity),wt[i]);
+	if(absRap)hdipho_Rapidity[i]->Fill(abs(lbylR.vSum_Rapidity),wt[i]);
+	if(!absRap)hdipho_Rapidity[i]->Fill(lbylR.vSum_Rapidity,wt[i]);
 	hdipho_Invmass[i]->Fill(lbylR.vSum_M,wt[i]);
 	
 	hdipho_RecoGenPt[i]->Fill(lbylR.vSum_Pt,lbylR.gen_diPho_Pt,wt[i]);
-	hdipho_RecoGenRapidity[i]->Fill(abs(lbylR.vSum_Rapidity),abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(absRap)hdipho_RecoGenRapidity[i]->Fill(abs(lbylR.vSum_Rapidity),abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(!absRap)hdipho_RecoGenRapidity[i]->Fill(lbylR.vSum_Rapidity,lbylR.gen_diPho_Rapidity,wt[i]);
 	hRecoGenInvmass[i]->Fill(lbylR.vSum_M,lbylR.gen_diPho_M,wt[i]);
 
 	responsePt.Fill(lbylR.vSum_Pt,lbylR.gen_diPho_Pt,wt[i]);
-	responseRapidity.Fill(abs(lbylR.vSum_Rapidity),abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(absRap)responseRapidity.Fill(abs(lbylR.vSum_Rapidity),abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(!absRap)responseRapidity.Fill(lbylR.vSum_Rapidity,lbylR.gen_diPho_Rapidity,wt[i]);
 	responseInvmass.Fill(lbylR.vSum_M,lbylR.gen_diPho_M,wt[i]);
 	} //isPassing analysis cuts
 	else {
 	responsePt.Miss(lbylR.gen_diPho_Pt,wt[i]);
-	responseRapidity.Miss(abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(absRap)responseRapidity.Miss(abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(!absRap)responseRapidity.Miss(lbylR.gen_diPho_Rapidity,wt[i]);
 	responseInvmass.Miss(lbylR.gen_diPho_M,wt[i]);
 	}
       } //trigger
 	else {
 	responsePt.Miss(lbylR.gen_diPho_Pt,wt[i]);
-	responseRapidity.Miss(abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(absRap)responseRapidity.Miss(abs(lbylR.gen_diPho_Rapidity),wt[i]);
+	if(!absRap)responseRapidity.Miss(lbylR.gen_diPho_Rapidity,wt[i]);
 	responseInvmass.Miss(lbylR.gen_diPho_M,wt[i]);
 	}
       
@@ -266,31 +298,43 @@ void makeUnfold(int method=1){
   char MethID2[100]; 
   //if(method==1)
    // {
+
       RooUnfoldBayes unfold(&responsePt, hdipho_Pt[0], 4);
       RooUnfoldBayes unfold2(&responseRapidity, hdipho_Rapidity[0], 4);
       RooUnfoldBayes unfold3(&responseInvmass, hdipho_Invmass[0], 4);
-      sprintf(MethID2,"Bayes unfolding");
-   // }  // OR
-  if(method==2)
-    { RooUnfoldSvd unfold(&responsePt, hdipho_Pt[0], 4);
-      RooUnfoldSvd unfold2(&responseRapidity, hdipho_Rapidity[0], 4);
-      RooUnfoldSvd unfold3(&responseInvmass, hdipho_Invmass[0], 4);
-      sprintf(MethID2,"Svd unfolding");
-    } // OR
-  //if(method==3)
-   // { RooUnfoldBinByBin unfold(&responsePt, hdipho_Pt[0], 4);
-   //   RooUnfoldBinByBin unfold2(&responseRapidity, hdipho_Rapidity[0], 4);
-   //   RooUnfoldBinByBin unfold3(&responseInvmass, hdipho_Invmass[0], 4);
-   //   sprintf(MethID2,"BinByBin unfolding");
-   // }
+  
 
-  TH1D* hUnfoldPt= (TH1D*) unfold.Hreco();
+    //sprintf(MethID2,"Bayes unfolding");
+   // }  // OR
+  //if(method==2)
+  //  { 
+
+     //   RooUnfoldSvd unfold(&responsePt, hdipho_Pt[0], 4);
+       // RooUnfoldSvd unfold2(&responseRapidity, hdipho_Rapidity[0], 4);
+      //  RooUnfoldSvd unfold3(&responseInvmass, hdipho_Invmass[0], 4);
+     // sprintf(MethID2,"Svd unfolding");
+ //   } // OR
+        TCanvas*c4 =  new TCanvas();
+        TMatrixD  responseMatrix1 = responsePt.Mresponse();
+        responseMatrix1.Draw("colz");
+        c4->SaveAs("7thNov/Pt.pdf");
+        TCanvas*c5 =  new TCanvas();
+        TMatrixD  responseMatrix2 = responseRapidity.Mresponse();
+        responseMatrix2.Draw("colz");
+        c5->SaveAs("7thNov/Rapidity.pdf");
+        TCanvas*c6 =  new TCanvas();
+        TMatrixD  responseMatrix3 = responseInvmass.Mresponse();
+        responseMatrix3.Draw("colz");
+        c6->SaveAs("7thNov/InvMass.pdf");
+
+
+  TH1D* hUnfoldPt= (TH1D*) unfold.Hunfold();
   unfold.PrintTable (cout,hdipho_GenPt[0]);
 
-  TH1D* hUnfoldRapidity= (TH1D*) unfold2.Hreco();
+  TH1D* hUnfoldRapidity= (TH1D*) unfold2.Hunfold();
   unfold2.PrintTable (cout,hdipho_GenRapidity[0]);
 
-  TH1D* hUnfoldInvmass= (TH1D*) unfold3.Hreco();
+  TH1D* hUnfoldInvmass= (TH1D*) unfold3.Hunfold();
   unfold3.PrintTable (cout,hdipho_GenInvmass[0]);
   
 
@@ -298,24 +342,63 @@ void makeUnfold(int method=1){
   /***************************  Start reading data and subtract background contributions ********************************/
 
   //TFile *f1=new TFile("diphoton_histos.root","r"); 
-  TFile *f1=new TFile("diphoton_histos_etaChecks.root","r"); 
+  TFile *f1=new TFile("RootFile/diphoton_histos.root","r"); 
+//  TFile *f1=new TFile("RootFile/diphoton_histos_Invmassbin-5-8-12-28.root","r"); 
 
-  TH1D *hdipho_Pt_data        = (TH1D*)f1->Get("hdiphoton_pt_data");
-  TH1D *hdipho_Rapidity_data  = (TH1D*)f1->Get("hdiphoton_rapidity_data"); 
-  TH1D *hdipho_Invmass_data   = (TH1D*)f1->Get("hinvmass_data"); 
+  TH1D *hdipho_Pt_data        = (TH1D*)f1->Get("hdipho_ptData");
+ // TH1D *hdipho_Rapidity_data  = (TH1D*)f1->Get("hdipho_RapidityData"); 
+ // TH1D *hdipho_Rapidity_data  = (TH1D*)f1->Get("hdipho_absRapidityData"); 
+  TH1D *hdipho_Rapidity_data  = (TH1D*)f1->Get("hdipho_Rapidity_unfoData"); 
+//  TH1D *hdipho_Invmass_data   = (TH1D*)f1->Get("hInvmassData"); 
+  TH1D *hdipho_Invmass_data   = (TH1D*)f1->Get("hInvmass_unfoData"); 
 
-  TH1D *hdipho_Pt_qed        = (TH1D*)f1->Get("hdiphoton_pt_qed");
-  TH1D *hdipho_Rapidity_qed  = (TH1D*)f1->Get("hdiphoton_rapidity_qed"); 
-  TH1D *hdipho_Invmass_qed   = (TH1D*)f1->Get("hinvmass_qed"); 
+  TH1D *hdipho_Pt_qed        = (TH1D*)f1->Get("hdipho_ptQEDSCFSR");
+  //TH1D *hdipho_Rapidity_qed  = (TH1D*)f1->Get("hdipho_RapidityQEDSCFSR"); 
+ // TH1D *hdipho_Rapidity_qed  = (TH1D*)f1->Get("hdipho_absRapidityQEDSCFSR"); 
+  TH1D *hdipho_Rapidity_qed  = (TH1D*)f1->Get("hdipho_Rapidity_unfoQEDSCFSR"); 
+  //TH1D *hdipho_Invmass_qed   = (TH1D*)f1->Get("hInvmassQEDSCFSR"); 
+  TH1D *hdipho_Invmass_qed   = (TH1D*)f1->Get("hInvmass_unfoQEDSCFSR"); 
 
-  TH1D *hdipho_Pt_cep        = (TH1D*)f1->Get("hdiphoton_pt_cep");
-  TH1D *hdipho_Rapidity_cep  = (TH1D*)f1->Get("hdiphoton_rapidity_cep"); 
-  TH1D *hdipho_Invmass_cep   = (TH1D*)f1->Get("hinvmass_cep"); 
+  TH1D *hdipho_Pt_cep        = (TH1D*)f1->Get("hdipho_ptCEPIncoh");
+  //TH1D *hdipho_Rapidity_cep  = (TH1D*)f1->Get("hdipho_RapidityCEPIncoh"); 
+ // TH1D *hdipho_Rapidity_cep  = (TH1D*)f1->Get("hdipho_absRapidityCEPIncoh"); 
+  TH1D *hdipho_Rapidity_cep  = (TH1D*)f1->Get("hdipho_Rapidity_unfoCEPIncoh"); 
+  //TH1D *hdipho_Invmass_cep   = (TH1D*)f1->Get("hInvmassCEPIncoh"); 
+  TH1D *hdipho_Invmass_cep   = (TH1D*)f1->Get("hInvmass_unfoCEPIncoh"); 
 
   // "===================      Subtract background ======================     
-  TH1D* hPt_data_bkgSub       = subtractBkg(hdipho_Pt_data,      hdipho_Pt_qed,      hdipho_Pt_cep, "hPt_data_bkgSub", 10,0,2);
-  TH1D* hRapidity_data_bkgSub = subtractBkg(hdipho_Rapidity_data,hdipho_Rapidity_qed,hdipho_Rapidity_cep,  "hRapidity_data_bkgSub", 2,0,1.6);
+  TH1D* hPt_data_bkgSub       = subtractBkg(hdipho_Pt_data,      hdipho_Pt_qed,      hdipho_Pt_cep, "hPt_data_bkgSub", 5,0,1);
+  //TH1D* hRapidity_data_bkgSub = subtractBkg(hdipho_Rapidity_data,hdipho_Rapidity_qed,hdipho_Rapidity_cep,  "hRapidity_data_bkgSub", nRapbin, Rapbin);
+  //TH1D* hRapidity_data_bkgSub = subtractBkg(hdipho_Rapidity_data,hdipho_Rapidity_qed,hdipho_Rapidity_cep,  "hRapidity_data_bkgSub", 2,0,2.2);
   //TH1D* hInvmass_data_bkgSub  = subtractBkg(hdipho_Invmass_data,hdipho_Invmass_qed,  hdipho_Invmass_cep, "hInvmass_data_bkgSub", nMassbin, Massbin);
+
+
+  hdipho_Rapidity_qed->Add(hdipho_Rapidity_cep,1);
+  TH1D* hRapidity_data_bkgSub = (TH1D*)hdipho_Rapidity_data->Clone();
+  hRapidity_data_bkgSub->Add(hdipho_Rapidity_qed,-1);
+ //For ()
+
+  hdipho_Invmass_qed->Add(hdipho_Invmass_cep,1);
+  TH1D* hInvmass_data_bkgSub = (TH1D*)hdipho_Invmass_data->Clone();
+  hInvmass_data_bkgSub->Add(hdipho_Invmass_qed,-1); 
+////////////////////////////
+
+/*
+  hdipho_Rapidity_qed->Add(hdipho_Rapidity_cep,1);
+  TH1D* hRapidity_data_bkgSub = (TH1D*)hdipho_Rapidity_data->Clone();
+//  hRapidity_data_bkgSub->Add(hdipho_Rapidity_qed,-1);
+  hRapidity_data_bkgSub->Add(hdipho_Rapidity_qed, -1);  
+
+  hdipho_Invmass_cep->Add(hdipho_Invmass_qed,1);
+  TH1D* hInvmass_data_bkgSub = (TH1D*)hdipho_Invmass_data->Clone();
+  hInvmass_data_bkgSub->Add(hdipho_Invmass_cep,-1);
+*/  
+//hInvmass_data_bkgSub->Add(hdipho_Invmass_cep, -1);
+////////////////////////////  
+//  TH1D* hInvmass_data_bkgSub = (TH1D*)hdipho_Invmass_data->Clone();
+//  hInvmass_data_bkgSub->Add(hdipho_Invmass_qed, -1);
+ // hInvmass_data_bkgSub->Add(hdipho_Invmass_cep, -1);
+
 
 
   // "===================     Unfold data ======================     
@@ -323,58 +406,65 @@ void makeUnfold(int method=1){
   c2->Divide(2,1);
   c2->cd(1);
 
+
       RooUnfoldBayes unfold_dataPt(&responsePt, hPt_data_bkgSub, 4); // unfold data
       RooUnfoldBayes unfold_dataRapidity(&responseRapidity, hRapidity_data_bkgSub, 4);
-      //RooUnfoldBayes unfold_dataInvmass(&responseInvmass, hInvmass_data_bkgSub, 4);
-      sprintf(MethID2,"Bayes unfolding");
+      RooUnfoldBayes unfold_dataInvmass(&responseInvmass, hInvmass_data_bkgSub, 4);
 
-  if(method==2)
-    { RooUnfoldSvd  unfold_dataPt(&responsePt, hPt_data_bkgSub, 4); // unfold data
-      RooUnfoldSvd  unfold_dataRapidity(&responseRapidity, hRapidity_data_bkgSub, 4);
-      //RooUnfoldSvd  unfold_dataInvmass(&responseInvmass, hInvmass_data_bkgSub, 4);
-      sprintf(MethID2,"Svd unfolding");
-    } // OR
-  //if(method==3)
-  //  { RooUnfoldBinByBin unfold_data(&response, hmumu_pt2_data_test);
-  //    RooUnfoldBinByBin unfold_data_rap(&response_rap, hmumu_rapidity_data_test);
-  //    sprintf(MethID2,"BinByBin unfolding");
-  //  }
+//      sprintf(MethID2,"Bayes unfolding");
+
+  //if(method==2)
+   // { 
+//      RooUnfoldSvd  unfold_dataPt(&responsePt, hPt_data_bkgSub, 4); // unfold data
+  //    RooUnfoldSvd  unfold_dataRapidity(&responseRapidity, hRapidity_data_bkgSub, 10);
+    //  RooUnfoldSvd  unfold_dataInvmass(&responseInvmass, hInvmass_data_bkgSub, 10);
+  //    sprintf(MethID2,"Svd unfolding");
   
-  TH1D* hUnfoldPt_data= (TH1D*) unfold_dataPt.Hreco();
+  TH1D* hUnfoldPt_data= (TH1D*) unfold_dataPt.Hunfold();
   unfold_dataPt.PrintTable (cout, hPt_data_bkgSub);
 
-  TH1D* hUnfoldRapidity_data= (TH1D*) unfold_dataRapidity.Hreco();
+  TH1D* hUnfoldRapidity_data= (TH1D*) unfold_dataRapidity.Hunfold();
   unfold_dataRapidity.PrintTable (cout, hRapidity_data_bkgSub);
 
-  //TH1D* hUnfoldInvmass_data= (TH1D*) unfold_dataInvmass.Hreco();
-  //unfold_dataInvmass.PrintTable (cout, hInvmass_data_bkgSub);
+  TH1D* hUnfoldInvmass_data= (TH1D*) unfold_dataInvmass.Hunfold();
+  unfold_dataInvmass.PrintTable (cout, hInvmass_data_bkgSub);
 
-  //printOutput(hUnfoldPt_data);
-  //printOutput(hUnfoldRapidity_data);
-  //printOutput(hUnfoldInvmass_data);
 
   // divide histograms by luminosty and binwidth to get the cross-sections. 
-  hGenPt_xSec  = getXSecHist(hdipho_GenPt[0], "hGenPt_xSec", 10, 0, 2 ,1 );
-  hGenRap_xSec = getXSecHist(hdipho_GenRapidity[0], "hGenRap_xSec", 2,0,1.6,1 );
-  //hGenInvmass_xSec = getXSecHist(hdipho_GenInvmass[0], "hGenInvmass_xSec", nMassbin, Massbin,1 );
+  hGenPt_xSec  = getXSecHist(hdipho_GenPt[0], "hGenPt_xSec", 5, 0, 1 ,1 );
+//  hGenRap_xSec = getXSecHist(hdipho_GenRapidity[0], "hGenRap_xSec",2,0,2.2, 1 );
+  hGenRap_xSec = getRapXSecHist(hdipho_GenRapidity[0], "hGenRap_xSec", 1 );
+  hGenInvmass_xSec = getInvXSecHist(hdipho_GenInvmass[0], "hGenInvmass_xSec" ,1 );
 
-  hRecoMCPt_xSec  = getXSecHist(hdipho_Pt[0], "hRecoMCPt_xSec", 10, 0, 2,1 );
-  hRecoMCRap_xSec = getXSecHist(hdipho_Rapidity[0], "hRecoMCRap_xSec", 2,0,1.6,1 );
-  //hRecoMCInvmass_xSec = getXSecHist(hdipho_Invmass[0], "hRecoMCInvmass_xSec", nMassbin, Massbin,1 );
+  hRecoMCPt_xSec  = getXSecHist(hdipho_Pt[0], "hRecoMCPt_xSec", 5, 0, 1,1 );
+ // hRecoMCRap_xSec = getXSecHist(hdipho_Rapidity[0], "hRecoMCRap_xSec", 2,0,2.2,1 );
+  hRecoMCRap_xSec = getRapXSecHist(hdipho_Rapidity[0], "hRecoMCRap_xSec", 1 );
+  hRecoMCInvmass_xSec = getInvXSecHist(hdipho_Invmass[0], "hRecoMCInvmass_xSec",1 );
 
+/*
   hRecoDataPt_xSec  = getXSecHist(hdipho_Pt_data, "hRecoDataPt_xSec", 10, 0, 2, 1.639);
-  hRecoDataRap_xSec = getXSecHist(hdipho_Rapidity_data, "hRecoDataRap_xSec", 2,0,1.6, 1.639);
-  //hRecoDataInvmass_xSec = getXSecHist(hdipho_Invmass_data, "hRecoDataInvmass_xSec", nMassbin, Massbin, 1.639);
+  //hRecoDataRap_xSec = getXSecHist(hdipho_Rapidity_data, "hRecoDataRap_xSec",2,0,1.6, 1.639);
+  hRecoDataRap_xSec = getRapXSecHist(hdipho_Rapidity_data, "hRecoDataRap_xSec", 1.639);
+  hRecoDataInvmass_xSec = getInvXSecHist(hdipho_Invmass_data, "hRecoDataInvmass_xSec", 1.639);
+*/
 
-  hUnfoMCPt_xSec  = getXSecHist(hUnfoldPt,       "hUnfoMCPt_xSec", 10, 0, 2,1 );
-  hUnfoMCRap_xSec = getXSecHist(hUnfoldRapidity, "hUnfoMCRap_xSec", 2,0,1.6,1 );
-  //hUnfoMCInvmass_xSec = getXSecHist(hUnfoldInvmass, "hUnfoMCInvmass_xSec", nMassbin, Massbin,1 );
+  hRecoDataPt_xSec  = getXSecHist(hPt_data_bkgSub, "hRecoDataPt_xSec", 5, 0, 1, 1.64723);
+ // hRecoDataRap_xSec = getXSecHist(hRapidity_data_bkgSub, "hRecoDataRap_xSec",2,0,2.2, 1.64723);
+  hRecoDataRap_xSec = getRapXSecHist(hRapidity_data_bkgSub, "hRecoDataRap_xSec", 1.64723);
+  hRecoDataInvmass_xSec = getInvXSecHist(hInvmass_data_bkgSub, "hRecoDataInvmass_xSec", 1.64723);
 
-  hUnfoDataPt_xSec  = getXSecHist(hUnfoldPt_data, "hUnfoDataPt_xSec", 10, 0, 2, 1.639);
-  hUnfoDataRap_xSec = getXSecHist(hUnfoldRapidity_data, "hUnfoDataRap_xSec", 2,0,1.6, 1.639);
-  //hUnfoDataInvmass_xSec = getXSecHist(hUnfoldInvmass_data, "hUnfoDataInvmass_xSec",nMassbin, Massbin, 1.639);
 
-hUnfoDataRap_xSec->Draw("p");
+  hUnfoMCPt_xSec  = getXSecHist(hUnfoldPt,       "hUnfoMCPt_xSec", 5, 0, 1,1 );
+ // hUnfoMCRap_xSec = getXSecHist(hUnfoldRapidity, "hUnfoMCRap_xSec",2,0,2.2, 1 );
+  hUnfoMCRap_xSec = getRapXSecHist(hUnfoldRapidity, "hUnfoMCRap_xSec", 1 );
+  hUnfoMCInvmass_xSec = getInvXSecHist(hUnfoldInvmass, "hUnfoMCInvmass_xSec", 1 );
+
+  hUnfoDataPt_xSec  = getXSecHist(hUnfoldPt_data, "hUnfoDataPt_xSec", 5, 0, 1, 1.64723);
+ // hUnfoDataRap_xSec = getXSecHist(hUnfoldRapidity_data, "hUnfoDataRap_xSec",2,0,2.2, 1.64723);
+  hUnfoDataRap_xSec = getRapXSecHist(hUnfoldRapidity_data, "hUnfoDataRap_xSec",  1.64723);
+  hUnfoDataInvmass_xSec = getInvXSecHist(hUnfoldInvmass_data, "hUnfoDataInvmass_xSec", 1.64723);
+
+  hUnfoDataRap_xSec->Draw("p");
 
 
 /*  new TCanvas();
@@ -407,34 +497,79 @@ hUnfoDataRap_xSec->Draw("p");
 
  hUnfoldInvmass_data->SetLineColor(kRed);
  hUnfoldInvmass_data->Draw("psame");*/
+ /*******************/
+/*  TCanvas*c11 = new TCanvas();
+  hPt_data_bkgSub->SetLineColor(kOrange);
+  hPt_data_bkgSub->SetMarkerColor(kOrange);
+  hPt_data_bkgSub->Draw("p");
+  hdipho_Pt[0]->Sumw2();
+  hdipho_Pt[0]->SetMarkerColor(kBlack);
+  hdipho_Pt[0]->Draw("psame");
+  
+  c11->SaveAs("Plot_7thNov/DiPho_Pt.png");
+  
+  TCanvas*c12 = new TCanvas();
+  hRapidity_data_bkgSub->SetLineColor(kOrange);
+  hRapidity_data_bkgSub->SetMarkerColor(kOrange);
+  hRapidity_data_bkgSub->Draw("p");
+  hdipho_Rapidity[0]->SetMarkerColor(kBlack);
+  hdipho_Rapidity[0]->Draw("psame");
+  c12->SaveAs("Plot_7thNov/DiPho_Rap.png");
+  TCanvas*c13 = new TCanvas();
+  hInvmass_data_bkgSub->SetLineColor(kOrange);
+  hInvmass_data_bkgSub->SetMarkerColor(kOrange);
+  hInvmass_data_bkgSub->Draw("p");
+  hdipho_Invmass[0]->SetMarkerColor(kBlack);
+  hdipho_Invmass[0]->Draw("psame");
+  c13->SaveAs("Plot_7thNov/DiPho_Mass.png");
+*/
+/********************/
+  cout << " invariant mass reco " << Sample[0] <<  " :" << hdipho_Invmass[0]->Integral() << endl;  
+  cout << " invariant mass Gen " << Sample[0] <<  " :" << hdipho_GenInvmass[0]->Integral() << endl;  
+  cout << " Rapidity reco " << Sample[0] <<  " :" << hdipho_Rapidity[0]->Integral() << endl;  
+  cout << " Pt reco " << Sample[0] <<  " :" << hdipho_Pt[0]->Integral() << endl;  
+  cout << " invariant mass data" << Sample[0] <<  " :" << hdipho_Invmass_data->Integral() << endl;
+  cout << " invariant mass data w/o bkg" << Sample[0] <<  " :" << hInvmass_data_bkgSub->Integral() << endl;
+  cout << " Rapidity data " << Sample[0] <<  " :" << hdipho_Rapidity_data->Integral() << endl;
+  cout << " Rapidity data w/o bkg " << Sample[0] <<  " :" << hRapidity_data_bkgSub->Integral() << endl;
+  cout << " Pt data " << Sample[0] <<  " :" << hdipho_Pt_data->Integral() << endl;
+  cout << " Pt data w/o bkg " << Sample[0] <<  " :" << hPt_data_bkgSub->Integral() << endl;
+  cout << "Cross section Pt Data:" <<  hRecoDataPt_xSec->Integral() << endl;
+  cout << "Cross section Rapidity Data:" <<  hRecoDataRap_xSec->Integral()<< endl;
+  cout << "Cross section Invmass Data:" << hRecoMCInvmass_xSec->Integral()<< endl;
+  cout << "Cross section Pt MC:" <<   hRecoMCPt_xSec->Integral() << endl;
+  cout << "Cross section Rapidity MC:" <<  hRecoMCRap_xSec->Integral()<< endl;
+  cout << "Cross section Invmass MC:" << hRecoMCInvmass_xSec->Integral()<< endl;
 
-
-
-  cout << " invariant mass " << sample[0] <<  " :" << hdipho_Invmass[0]->Integral() << endl;  
-  //cout << " invariant mass " << sample[1] <<  " :" << hdipho_Invmass[1]->Integral() << endl;  
-  //cout << " invariant mass " << sample[2] <<  " :" << hdipho_Invmass[2]->Integral() << endl;  
   outf->cd();
   //outf->Write();
- //hPt_data_bkgSub->Write();
+  
+
+///
   hGenPt_xSec->Write();
   hGenRap_xSec->Write();
-  //hGenInvmass_xSec->Write();
+  hGenInvmass_xSec->Write();
 
   hRecoMCPt_xSec->Write();
   hRecoMCRap_xSec->Write();
-  //hRecoMCInvmass_xSec->Write();
+  hRecoMCInvmass_xSec->Write();
 
   hRecoDataPt_xSec->Write();
   hRecoDataRap_xSec->Write();
-  //hRecoDataInvmass_xSec->Write();
+  hRecoDataInvmass_xSec->Write();
 
   hUnfoMCPt_xSec->Write();
   hUnfoMCRap_xSec->Write();
-  //hUnfoMCInvmass_xSec->Write();
+  hUnfoMCInvmass_xSec->Write();
 
   hUnfoDataPt_xSec->Write();
   hUnfoDataRap_xSec->Write();
-  //hUnfoDataInvmass_xSec->Write();
+  hUnfoDataInvmass_xSec->Write();
+
+  TCanvas*c1 =  new TCanvas();
+  hdipho_Rapidity[0]->SetLineColor(kRed);
+  hdipho_Rapidity[0]->Draw("p");;
+   
 
 
   outf->Close();
@@ -444,13 +579,6 @@ hUnfoDataRap_xSec->Draw("p");
   //hUnfoldRapidity->Write();
   //hUnfoldRapidity_data->Write();
   //hUnfoldInvmass->Write();
-
-
-
-  
-  
-
-
   
 }
 
@@ -495,7 +623,7 @@ TH1D* getXSecHist(TH1D *hist, const char* name, int nbins, float xmin, float xma
       hans->SetBinError(i, binError);
     }
 
-      //cout << "******bin:" << i << " " << hans->GetBinContent(i) << "+/-" <<  binError<< endl;
+      cout << "******bin:" << i << " " << hans->GetBinContent(i) << "+/-" <<  binError<< endl;
       //double err=0;
       //for (int ivar=1; ivar<14; ivar++) err += pow(hvari[ivar]->GetBinContent(i)-hvari[0]->GetBinContent(i),2);
       //hans->SetBinError(i,sqrt(err+pow(hans->GetBinError(i),2)+pow(glob_syst,2)));
@@ -504,6 +632,57 @@ TH1D* getXSecHist(TH1D *hist, const char* name, int nbins, float xmin, float xma
 
 }
 
+TH1D* getInvXSecHist(TH1D *hist, const char* name, float luminosity){
+
+  TH1D *hans = new TH1D(name,"",nMassbin, Massbin);
+   cout << " Name of histogram :" << name << endl;
+   for (int i=1; i<=hist->GetNbinsX(); i++) {
+
+      double binCont  = hist->GetBinContent(i)/(luminosity*hist->GetBinWidth(i));
+
+      double binError = binCont * sqrt(pow(hist->GetBinError(i)/hist->GetBinContent(i),2));
+      //double binError = hist->GetBinError(i);
+      if(binCont == 0){ hans->SetBinContent(i, 0);
+       hans->SetBinError(i, 0);}
+	else{
+      hans->SetBinContent(i, binCont);
+      hans->SetBinError(i, binError);
+    }
+
+      cout << "******bin:" << i << " " << hans->GetBinContent(i) << "+/-" <<  binError<< endl;
+      //double err=0;
+      //for (int ivar=1; ivar<14; ivar++) err += pow(hvari[ivar]->GetBinContent(i)-hvari[0]->GetBinContent(i),2);
+      //hans->SetBinError(i,sqrt(err+pow(hans->GetBinError(i),2)+pow(glob_syst,2)));
+   }
+   return hans;
+
+}
+
+TH1D* getRapXSecHist(TH1D *hist, const char* name, float luminosity){
+
+  TH1D *hans = new TH1D(name,"",nRapbin, Rapbin);
+   cout << " Name of histogram :" << name << endl;
+   for (int i=1; i<=hist->GetNbinsX(); i++) {
+
+      double binCont  = hist->GetBinContent(i)/(luminosity*hist->GetBinWidth(i));
+
+      double binError = binCont * sqrt(pow(hist->GetBinError(i)/hist->GetBinContent(i),2));
+      //double binError = hist->GetBinError(i);
+      if(binCont == 0){ hans->SetBinContent(i, 0);
+       hans->SetBinError(i, 0);}
+	else{
+      hans->SetBinContent(i, binCont);
+      hans->SetBinError(i, binError);
+    }
+
+      cout << "******bin:" << i << " " << hans->GetBinContent(i) << "+/-" <<  binError<< endl;
+      //double err=0;
+      //for (int ivar=1; ivar<14; ivar++) err += pow(hvari[ivar]->GetBinContent(i)-hvari[0]->GetBinContent(i),2);
+      //hans->SetBinError(i,sqrt(err+pow(hans->GetBinError(i),2)+pow(glob_syst,2)));
+   }
+   return hans;
+
+}
 
 void printOutput(TH1D *hist){
  for (int i=1; i<=hist->GetNbinsX(); i++) {

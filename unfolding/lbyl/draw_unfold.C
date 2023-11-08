@@ -68,23 +68,25 @@ void draw_unfold(int method =1)
   if(method==1)
   {
     
-    sprintf(MethID1,"Bayes_unfo");
+//    sprintf(MethID1,"Bayes_unfo");
   }
   if(method==2)
   {
-    sprintf(MethID1,"Svd_unfo ");
+  //  sprintf(MethID1,"Svd_unfo ");
   }
   if(method==3)
   {
-    sprintf(MethID1,"BinByBin_unfo");
+    //sprintf(MethID1,"BinByBin_unfo");
   }
   
-  TFile *f1= new TFile(Form("unfolding_histograms_%s.root",MethID1),"r");
+  string mc_name = "SC";
+
+  TFile *f1= new TFile(Form("unfolding_histograms_Bayes_%s.root",mc_name.c_str()),"r");
   cout<<"   "<<f1->GetName()<<endl;
   
   
-  TFile *f2= new TFile(Form("unfolding_histograms_invmass_%s.root",MethID1),"r");
-  cout<<"   "<<f2->GetName()<<endl;
+  //TFile *f2= new TFile(Form("unfolding_histograms_invmass_%s_%s.root",MethID1,mc_name.c_str()),"r");
+  //cout<<"   "<<f2->GetName()<<endl;
   
   TH1D *hMuMu_pt_gen          = (TH1D*)f1->Get("hGenPt_xSec");
   TH1D *hMuMu_pt_recomc       = (TH1D*)f1->Get("hRecoMCPt_xSec");
@@ -99,11 +101,11 @@ void draw_unfold(int method =1)
   TH1D *hMuMu_rapidity_unfomc       = (TH1D*)f1->Get("hUnfoMCRap_xSec");
   
   
-  TH1D *hMuMu_invmass_gen          = (TH1D*)f2->Get("hGenInvmass_xSec");
-  TH1D *hMuMu_invmass_recomc       = (TH1D*)f2->Get("hRecoMCInvmass_xSec");
-  TH1D *hMuMu_invmass_recodata     = (TH1D*)f2->Get("hRecoDataInvmass_xSec");
-  TH1D *hMuMu_invmass_unfodata     = (TH1D*)f2->Get("hUnfoDataInvmass_xSec");
-  TH1D *hMuMu_invmass_unfomc       = (TH1D*)f2->Get("hUnfoMCInvmass_xSec");
+  TH1D *hMuMu_invmass_gen          = (TH1D*)f1->Get("hGenInvmass_xSec");
+  TH1D *hMuMu_invmass_recomc       = (TH1D*)f1->Get("hRecoMCInvmass_xSec");
+  TH1D *hMuMu_invmass_recodata     = (TH1D*)f1->Get("hRecoDataInvmass_xSec");
+  TH1D *hMuMu_invmass_unfodata     = (TH1D*)f1->Get("hUnfoDataInvmass_xSec");
+  TH1D *hMuMu_invmass_unfomc       = (TH1D*)f1->Get("hUnfoMCInvmass_xSec");
   
   cout<<"ok"<<endl;
   
@@ -113,7 +115,7 @@ void draw_unfold(int method =1)
   leg1->SetFillStyle(0);
   leg1->SetTextFont(43);
   leg1->SetTextSize(24);
-  leg1->AddEntry(hMuMu_pt_unfomc,"Unfolded MC (Bayes)","pl");
+  leg1->AddEntry(hMuMu_pt_unfomc,"Unfolded MC","pl");
   leg1->AddEntry(hMuMu_pt_gen, "Gen-level MC (Superchic)","pl");
   leg1->AddEntry(hMuMu_pt_recomc, "Reconstructed MC (Superchic)", "pl");
   
@@ -126,22 +128,25 @@ void draw_unfold(int method =1)
   leg2->SetTextSize(24);
   
   leg2->AddEntry(hMuMu_pt_recodata,"Reconstructed data","pl");
-  leg2->AddEntry(hMuMu_pt_unfodata,"Unfolded data (Bayes)","pl");
+  leg2->AddEntry(hMuMu_pt_unfodata,"Unfolded data","pl");
   leg2->AddEntry(hMuMu_pt_recomc, "Reconstructed MC (Superchic)", "pl");
   leg2->AddEntry(hMuMu_pt_gen, "Gen-level MC (Superchic)", "pl");
   
   int W = 600;
-  int H = 500;
+  int H = 670;//500
   
   // pT
   TCanvas* c1 = new TCanvas("c1","Dimuon pT",50,50,W,H);
   prepare_canvas(c1);
-  c1->cd();
-  gPad->SetLogy();
-  
-  
+//  c1->cd();
+//  gPad->SetLogy();//Diphototn pT
+  TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
+  pad1->SetBottomMargin(0);
+  pad1->Draw();
+  pad1->cd();
+  pad1->SetLogy();
   string x_title = "p_{T}^{#gamma#gamma} (GeV)";
-  string y_title = "d#sigma_{#gamma#gamma}/dp_{T}^{#gamma#gamma} (nb / 0.2 GeV)";
+  string y_title = "d#sigma_{#gamma#gamma}/dp_{T}^{#gamma#gamma} (nb)";
   
   cout<<"pt bin width:" <<hMuMu_pt_unfodata->GetXaxis()->GetBinWidth(1)<<endl;
   
@@ -158,27 +163,58 @@ void draw_unfold(int method =1)
   hMuMu_pt_unfomc->Draw("psame");
   make_hist(hMuMu_pt_recomc,x_title,y_title,20,1.0,mc_reco_color,1,2);
   hMuMu_pt_recomc->Draw("ehistsamex0");
-  
-  //CMS_lumi( c1, 1, 10 );
   leg1->Draw();
-  c1->Print(Form("./fig/closure_pt_%s.pdf",MethID1));
+
+  c1->cd();
+  TPad *pad2 = new TPad("pad2", "pad2", 0, 0.06, 1, 0.28);
+  pad2->SetTopMargin(0);
+  pad2->SetBottomMargin(0.3);
+  pad2->SetGridx();
+  pad2->Draw();
+  pad2->cd();
+  TString strRatio=hMuMu_pt_gen->GetName();
+  strRatio+="_over_";
+  strRatio+=hMuMu_pt_gen->GetName();
+  TH1D* hratio=(TH1D*)hMuMu_pt_unfomc->Clone(strRatio);
+  hratio->Sumw2();
+
+  hratio->Divide(hMuMu_pt_gen);
+  hratio->SetTitle("");
+  //hratio->GetXaxis()->SetTitle(ytitle);
+  hratio->GetYaxis()->SetTitle("Unfo/Gen");
+  hratio->SetLabelSize(0.1, "XYZ");
+  hratio->SetLabelFont(42, "XYZ");
+  hratio->SetLabelOffset(0.007, "XYZ");
+  hratio->SetTitleSize(0.11, "XYZ");
+  hratio->GetXaxis()->SetTitleOffset(1.0);
+  hratio->GetYaxis()->SetTitleOffset(0.3);
+  hratio->Draw("p");
+  // c1->Update();
+  //CMS_lumi( c1, 1, 10 );
+  //leg1->Draw();
+  c1->Print("7thNov/closure_pt.png");
+  c1->Print("7thNov/closure_pt.pdf");
   
   
   TCanvas* c2 = new TCanvas("c2","Dimuon pT",50,50,W,H);
   prepare_canvas(c2);
-  c2->cd();
+ // c2->cd();
   //gPad->SetLogy();
   //hMuMu_pt_unfodata->SetMaximum(60);
   //hMuMu_pt_unfodata->SetMinimum(0);
-  gPad->SetLogy();
-  
+  //gPad->SetLogy();
+  TPad *pad3 = new TPad("pad3", "pad3", 0, 0.3, 1, 1.0);
+  pad3->SetBottomMargin(0);
+  pad3->Draw();
+  pad3->cd();
+  pad3->SetLogy();  
   hMuMu_pt_unfodata->SetMaximum(2*pow(10.,3.));
   hMuMu_pt_unfodata->SetMinimum(5*pow(10.,-2.));
   
   make_hist(hMuMu_pt_unfodata,x_title,y_title,20,1.0,data_unfold_color,1,2);
   auto hMuMu_pt_unfodata_syst = get_stat_uncertainty_hist(hMuMu_pt_unfodata);
   hMuMu_pt_unfodata_syst->Draw("e2");
-  
+//  hMuMu_pt_unfodata_syst->GetYaxis()->SetRangeUser(0,500); 
   hMuMu_pt_unfodata->Draw("psameex0");
   hMuMu_pt_gen->Draw("histsamex0");
   hMuMu_pt_gen_syst->Draw("e2same");
@@ -189,12 +225,43 @@ void draw_unfold(int method =1)
   
   //CMS_lumi( c2, 1, 10 );
   leg2->Draw();
-  c2->Print(Form("./fig/data_pt_%s.pdf",MethID1));
+  c2->cd();
+  TPad *pad4 = new TPad("pad4", "pad4", 0, 0.06, 1, 0.28);
+  pad4->SetTopMargin(0);
+  pad4->SetBottomMargin(0.3);
+  pad4->SetGridx();
+  pad4->Draw();
+  pad4->cd();
+  TString strRatio2=hMuMu_pt_gen->GetName();
+  strRatio2+="_over_";
+  strRatio2+=hMuMu_pt_gen->GetName();
+  TH1D* hratio2=(TH1D*)hMuMu_pt_unfodata->Clone(strRatio2);
+  hratio2->Sumw2();
+
+  hratio2->Divide(hMuMu_pt_gen);
+  hratio2->SetTitle("");
+  hratio2->GetYaxis()->SetTitle("UnfoData/Gen");
+  hratio2->SetLabelSize(0.1, "XYZ");
+  hratio2->SetLabelFont(42, "XYZ");
+  hratio2->SetLabelOffset(0.007, "XYZ");
+  hratio2->SetTitleSize(0.11, "XYZ");
+  hratio2->GetXaxis()->SetTitleOffset(1.0);
+  hratio2->GetYaxis()->SetTitleOffset(0.3);
+  hratio2->GetYaxis()->SetRangeUser(0.0, 2.0);
+  hratio2->Draw("p");
+  c2->Print("7thNov/data_pt.pdf");
+  c2->Print("7thNov/data_pt.png");
+
   
   // Rapidity
   TCanvas* c3 = new TCanvas("c3","Dimuon rapidity",50,50,W,H);
   prepare_canvas(c3);
-  c3->cd();
+  TPad *pad5 = new TPad("pad5", "pad5", 0, 0.3, 1, 1.0);
+  pad5->SetBottomMargin(0);
+  pad5->Draw();
+  pad5->cd();
+
+ // c3->cd();
   
   x_title = "|y_{#gamma#gamma}|";
   y_title = "d#sigma_{#gamma#gamma}/dy_{#gamma#gamma} (nb)";
@@ -206,7 +273,7 @@ void draw_unfold(int method =1)
   make_hist(hMuMu_rapidity_gen,x_title,y_title,20,1.0,mc_gen_color,1,2);
   auto hMuMu_rapidity_gen_syst = get_stat_uncertainty_hist(hMuMu_rapidity_gen, syst_uncertainty_mc);
   
-  hMuMu_rapidity_gen_syst->SetMaximum(100);
+  hMuMu_rapidity_gen_syst->SetMaximum(60);//100
   hMuMu_rapidity_gen_syst->SetMinimum(0);
   
   hMuMu_rapidity_gen_syst->Draw("e2");
@@ -216,14 +283,46 @@ void draw_unfold(int method =1)
   hMuMu_rapidity_recomc->Draw("ehistsamex0");
   
   //CMS_lumi( c3, 1, 10 );
-//  leg1->Draw();
-  c3->Print(Form("./fig/closure_rapidity_%s.pdf",MethID1));
+  leg1->Draw();
+  c3->cd();
+  TPad *pad6 = new TPad("pad6", "pad6", 0, 0.06, 1, 0.28);
+  pad6->SetTopMargin(0);
+  pad6->SetBottomMargin(0.3);
+  pad6->SetGridx();
+  pad6->Draw();
+  pad6->cd();
+  TString strRatio3=hMuMu_rapidity_gen->GetName();
+  strRatio3+="_over_";
+  strRatio3+=hMuMu_rapidity_gen->GetName();
+  TH1D* hratio3=(TH1D*)hMuMu_rapidity_unfomc->Clone(strRatio3);
+  hratio3->Sumw2();
+
+  hratio3->Divide(hMuMu_rapidity_gen);
+  hratio3->SetTitle("");
+  hratio3->GetYaxis()->SetTitle("Unfo/Gen");
+  hratio3->SetLabelSize(0.1, "XYZ");
+  hratio3->SetLabelFont(42, "XYZ");
+  hratio3->SetLabelOffset(0.007, "XYZ");
+  hratio3->SetTitleSize(0.11, "XYZ");
+  hratio3->GetXaxis()->SetTitleOffset(1.0);
+  hratio3->GetYaxis()->SetTitleOffset(0.3);
+  //hratio3->GetYaxis()->SetRangeUser(0.0, 2.0);
+  hratio3->Draw("p");
+
+  c3->Print("7thNov/closure_rapidity.pdf");
+  c3->Print("7thNov/closure_rapidity.png");
+
   
   TCanvas* c4 = new TCanvas("c4","Dimuon rap",50,50,W,H);
   prepare_canvas(c4);
-  c4->cd();
+  TPad *pad7 = new TPad("pad7", "pad7", 0, 0.3, 1, 1.0);
+  pad7->SetBottomMargin(0);
+  pad7->Draw();
+  pad7->cd();
+
+//  c4->cd();
   
-  hMuMu_rapidity_unfodata->SetMaximum(100);
+  hMuMu_rapidity_unfodata->SetMaximum(60);//100
   hMuMu_rapidity_unfodata->SetMinimum(0);
   make_hist(hMuMu_rapidity_unfodata,x_title,y_title,20,1.0,data_unfold_color,1,2);
   auto hMuMu_rapidity_unfodata_syst = get_stat_uncertainty_hist(hMuMu_rapidity_unfodata);
@@ -237,26 +336,52 @@ void draw_unfold(int method =1)
   hMuMu_rapidity_recodata->Draw("ehistsamex0");
   
   //CMS_lumi( c4, 1, 10 );
-//  leg2->Draw();
-  c4->Print(Form("./fig/data_rapidity_%s.pdf",MethID1));
-  
-  
-  
+  leg2->Draw();
+  c4->cd();
+  TPad *pad8 = new TPad("pad8", "pad8", 0, 0.06, 1, 0.28);
+  pad8->SetTopMargin(0);
+  pad8->SetBottomMargin(0.3);
+  pad8->SetGridx();
+  pad8->Draw();
+  pad8->cd();
+  TString strRatio4=hMuMu_rapidity_gen->GetName();
+  strRatio4+="_over_";
+  strRatio4+=hMuMu_rapidity_gen->GetName();
+  TH1D* hratio4=(TH1D*)hMuMu_rapidity_unfodata->Clone(strRatio4);
+  hratio4->Sumw2();
+
+  hratio4->Divide(hMuMu_rapidity_gen);
+  hratio4->SetTitle("");
+  hratio4->GetYaxis()->SetTitle("UnfoData/Gen");
+  hratio4->SetLabelSize(0.1, "XYZ");
+  hratio4->SetLabelFont(42, "XYZ");
+  hratio4->SetLabelOffset(0.007, "XYZ");
+  hratio4->SetTitleSize(0.11, "XYZ");
+  hratio4->GetXaxis()->SetTitleOffset(1.0);
+  hratio4->GetYaxis()->SetTitleOffset(0.3);
+  hratio4->GetYaxis()->SetRangeUser(0.0, 2.0);
+  hratio4->Draw("p");
+  c4->Print("7thNov/data_rapidity.pdf");
+  c4->Print("7thNov/data_rapidity.png");
   
   //invmass
   TCanvas* c5 = new TCanvas("c5","Dimuon invmass",50,50,W,H);
   prepare_canvas(c5);
-  c5->cd();
+  TPad *pad9 = new TPad("pad9", "pad9", 0, 0.3, 1, 1.0);
+  pad9->SetBottomMargin(0);
+  pad9->Draw();
+  pad9->cd();
+ // c5->cd();
   
   x_title = "m_{#gamma#gamma} (GeV)";
-  y_title = "d#sigma_{#gamma#gamma}/dm_{#gamma#gamma} (nb / 2 GeV)";
+  y_title = "d#sigma_{#gamma#gamma}/dm_{#gamma#gamma} (nb)";
   
   cout<<"m_inv bin width:" <<hMuMu_invmass_unfodata->GetXaxis()->GetBinWidth(1)<<endl;
   
   make_hist(hMuMu_invmass_unfomc,x_title,y_title,20,1.0,data_unfold_color,1,1);
   make_hist(hMuMu_invmass_gen,x_title,y_title,20,1.0,mc_gen_color,1,2);
   
-  hMuMu_invmass_gen->SetMaximum(50);
+  hMuMu_invmass_gen->SetMaximum(25);//50
   hMuMu_invmass_gen->SetMinimum(0);
   hMuMu_invmass_gen->Draw("histsame");
   auto hMuMu_invmass_gen_syst = get_stat_uncertainty_hist(hMuMu_invmass_gen, syst_uncertainty_mc);
@@ -267,14 +392,43 @@ void draw_unfold(int method =1)
   hMuMu_invmass_unfomc->Draw("psamex0");
   
   //CMS_lumi( c5, 1, 10 );
-//  leg1->Draw();
-  c5->Print(Form("./fig/closure_invmass_%s.pdf",MethID1));
+  leg1->Draw();
+  c5->cd();
+  TPad *pad10 = new TPad("pad10", "pad10", 0, 0.06, 1, 0.28);
+  pad10->SetTopMargin(0);
+  pad10->SetBottomMargin(0.3);
+  pad10->SetGridx();
+  pad10->Draw();
+  pad10->cd();
+  TString strRatio5=hMuMu_invmass_gen->GetName();
+  strRatio5+="_over_";
+  strRatio5+=hMuMu_invmass_gen->GetName();
+  TH1D* hratio5=(TH1D*)hMuMu_invmass_unfomc->Clone(strRatio5);
+  hratio5->Sumw2();
+
+  hratio5->Divide(hMuMu_invmass_gen);
+  hratio5->SetTitle("");
+  hratio5->GetYaxis()->SetTitle("Unfo/Gen");
+  hratio5->SetLabelSize(0.1, "XYZ");
+  hratio5->SetLabelFont(42, "XYZ");
+  hratio5->SetLabelOffset(0.007, "XYZ");
+  hratio5->SetTitleSize(0.11, "XYZ");
+  hratio5->GetXaxis()->SetTitleOffset(1.0);
+  hratio5->GetYaxis()->SetTitleOffset(0.3);
+  hratio5->Draw("p");
+  c5->Print("7thNov/closure_invmass.pdf");
+  c5->Print("7thNov/closure_invmass.png");
   
   TCanvas* c6 = new TCanvas("c6","Dimuon rap",50,50,W,H);
   prepare_canvas(c6);
-  c6->cd();
+  TPad *pad11 = new TPad("pad11", "pad11", 0, 0.3, 1, 1.0);
+  pad11->SetBottomMargin(0);
+  pad11->Draw();
+  pad11->cd();
+  //c6->cd();
+
   
-  hMuMu_invmass_unfodata->SetMaximum(50);
+  hMuMu_invmass_unfodata->SetMaximum(20);//50
   hMuMu_invmass_unfodata->SetMinimum(0);
   make_hist(hMuMu_invmass_unfodata,x_title,y_title,20,1.0,data_unfold_color,1,2);
   auto hMuMu_invmass_unfodata_syst = get_stat_uncertainty_hist(hMuMu_invmass_unfodata);
@@ -288,8 +442,35 @@ void draw_unfold(int method =1)
   hMuMu_invmass_recodata->Draw("ehistsamex0");
   
   //CMS_lumi( c6, 1, 10 );
+  leg2->Draw();
+  
+  c6->cd();
+  TPad *pad12 = new TPad("pad12", "pad12", 0, 0.06, 1, 0.28);
+  pad12->SetTopMargin(0);
+  pad12->SetBottomMargin(0.3);
+  pad12->SetGridx();
+  pad12->Draw();
+  pad12->cd();
+  TString strRatio6=hMuMu_invmass_gen->GetName();
+  strRatio6+="_over_";
+  strRatio6+=hMuMu_invmass_gen->GetName();
+  TH1D* hratio6=(TH1D*)hMuMu_invmass_unfodata->Clone(strRatio6);
+  hratio6->Sumw2();
+
+  hratio6->Divide(hMuMu_invmass_gen);
+  hratio6->SetTitle("");
+  hratio6->GetYaxis()->SetTitle("UnfoData/Gen");
+  hratio6->SetLabelSize(0.1, "XYZ");
+  hratio6->SetLabelFont(42, "XYZ");
+  hratio6->SetLabelOffset(0.007, "XYZ");
+  hratio6->SetTitleSize(0.11, "XYZ");
+  hratio6->GetXaxis()->SetTitleOffset(1.0);
+  hratio6->GetYaxis()->SetTitleOffset(0.3);
+  hratio6->GetYaxis()->SetRangeUser(0.0, 1.6);
+  hratio6->Draw("p");
 //  leg2->Draw();
-  c6->Print(Form("./fig/data_invmass_%s.pdf",MethID1));
+  c6->Print("7thNov/data_invmass.pdf");
+  c6->Print("7thNov/data_invmass.png");
   
   printBinCont(hMuMu_pt_unfodata);
   printBinCont(hMuMu_rapidity_unfodata);
