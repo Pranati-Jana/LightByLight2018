@@ -54,17 +54,17 @@ maxDeltaR:              0.3
 
 ### Photon ID cuts:
 photonMinEt:                            2.0
-photonMaxEta:                         2.1
+photonMaxEta:                         2.2
 photonMaxHoverEbarrel:          0.04596
 photonMaxHoverEendcap:       0.0590
 photonMaxEtaWidthBarrel:       0.0106
 photonMaxEtaWidthEndcap:    0.0272
-photonMaxSigmaEta2012Barrel:     999999
-photonMaxSigmaEta2012Endcap:  999999
-photonMinSwissCross:             0.0
+photonMaxSigmaEta2012Barrel:     0.02
+photonMaxSigmaEta2012Endcap:  0.02
+photonMinSwissCross:             0.95
 diphotonMaxPt:                        1.0
 diphotonMaxRapidity:               9999999
-diphotonMinMass:                    6.0
+diphotonMinMass:                    5.0
 diphotonMaxAco:                      0.01
 photonRejectConverted:           1
 

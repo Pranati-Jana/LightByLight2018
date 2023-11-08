@@ -89,6 +89,7 @@ vector<tuple<string, int, double, double>> histParams = {
   {"HoverEendcap"           , 300 , 0   , 0.6 },
   {"etaHighHoverE"          , 320 , 0   , 3.2 },
   {"etaLowHoverE"           , 320 , 0   , 3.2 },
+  
 };
 
 vector<tuple<string, int, double, double, int, double, double>> histParams2D = {
@@ -189,16 +190,19 @@ void fillHistograms(const unique_ptr<EventProcessor> &events,
       
       if(passesSwissCross && passesHoverE){
         hists.at("showerShape"+suffixUpper+datasetName)->Fill(etaWidth);
-      }
+        cout << "Shower shape:" << endl;
+       }
       if(passesSwissCross && passesSigmaEtaEta){
         hists.at("HoverE"+suffixLower+datasetName)->Fill(hOverE);
         hists2D.at("HoverEmapNum"+datasetName)->Fill(photon->GetPhi(), photon->GetEta(), hOverE);
         hists2D.at("HoverEmapDen"+datasetName)->Fill(photon->GetPhi(), photon->GetEta());
-      }
+        cout << "HOverE:" << endl;
+       }
       
       if(passesHoverE && passesSigmaEtaEta){
         hists.at("swissCross"+suffixUpper+datasetName)->Fill(swissCross);
-      }
+        cout << "SwissCross:" << endl;
+       }
       
       if(passesSwissCross && passesHoverE && passesSigmaEtaEta){
         hists.at("eta"+suffixUpper+datasetName)->Fill(eta);
@@ -207,7 +211,8 @@ void fillHistograms(const unique_ptr<EventProcessor> &events,
           hists.at("etaLowWidth"+suffixUpper+datasetName)->Fill(eta);
           hists.at("etLowWidth"+suffixUpper+datasetName)->Fill(photon->GetEt());
         }
-      } //passes ID cuts N-1 plot
+       cout << "eta width:" << endl;   
+    } //passes ID cuts N-1 plot
       
       
     } //photon

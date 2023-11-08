@@ -9,7 +9,10 @@ PhysObject::PhysObject() :
 eta(9999),
 phi(9999),
 energy(-1),
-
+fromConversion (false),
+mass(9999),//mass
+nConversionTracks(-9999),
+//
 etaSC(9999),
 etSC(-9999),
 phiSC(9999),
@@ -70,6 +73,7 @@ pixelLayers(-9999),
 trkQuality(false),
 innD0(-9999),
 innDz(-9999)
+//
 {
   
 }
@@ -119,6 +123,10 @@ double PhysObject::GetPhi() const
 
 double PhysObject::GetEt()  const
 {
+  if(fromConversion){
+  return pt;
+  }
+
   if(et < 0) Log(1)<<"WARNING - carefull, et probably not set\n";
   return et;
 }
@@ -300,8 +308,21 @@ double PhysObject::GetPVertexZ() const
 }
  
 /////////////////////////////////////////////////////////////////////////////
+//
+double PhysObject::GetMass()     const
+{
+
+  if(mass<0) Log(1)<<"WARNING - carefull, mass probably not set\n";
+  return mass;
+}
+
+////
 double PhysObject::GetEnergy()     const
 {
+//  if(fromConversion){
+ // return mass;
+ // }  
+
   if(energy<0) Log(1)<<"WARNING - carefull, energy probably not set\n";
   return energy;
 }
@@ -455,4 +476,13 @@ double PhysObject::GetInnerDz() const
   if(innDz < -999) Log(1)<<"WARNING - carefull, innerdz probably not set\n";
   return innDz;
 }
+//
+int  PhysObject::GetNConversionTracks() const
+{
+  if(nConversionTracks < 0) Log(1)<<"WARNING - carefull, innerdz probably not set\n";
+  return nConversionTracks;
+}
+
+
+
 /*******************************************************/

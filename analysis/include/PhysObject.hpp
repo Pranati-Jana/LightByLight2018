@@ -58,6 +58,8 @@ public:
   double GetVertexY()       const;
   double GetVertexZ()       const;
   ///////////////////////////////////
+  double GetMass()       const;
+  //
   double GetEnergy()     const;
   double GetEnergyHad()  const;
   double GetEnergyEm()   const;
@@ -97,12 +99,20 @@ public:
   double GetPVertexY() const;
   double GetPVertexZ() const;
 ///////////////////////////////////////////////////////////////////
+  int GetNConversionTracks() const;
+  bool FromConversion() const{
+  return fromConversion;
+}
+
    
 private:
   double eta;       ///< Pseudorapidity
   double phi;       ///< Azimuthal angle
   double energy;    ///< Energy
-  
+  double mass;    ///< Mass
+  bool fromConversion; 
+  int nConversionTracks;
+ 
   double etaSC;     ///< Pseudorapidity of the supercluster
   double etSC;      ///< Transverse energy of the supercluster
   double phiSC;     ///< Azimuthal angle of the supercluster

@@ -457,7 +457,7 @@ void CheckTriggerHFvetoEfficiency(Event &event, map<string, TH1D*> &hists, strin
   // Check matching with L1 objects
   for(auto &L1EG : event.GetPhysObjects(EPhysObjType::kL1EG)){
     if(matchedElectrons.size() == 2) break;
-    if(L1EG->GetEt() < 2.0) continue;
+    if(L1EG->GetEt() < 2.5) continue;//before 2.0
     
     double deltaR1 = physObjectProcessor.GetDeltaR_SC(*electron1, *L1EG);
     double deltaR2 = physObjectProcessor.GetDeltaR_SC(*electron2, *L1EG);

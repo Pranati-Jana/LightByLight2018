@@ -33,6 +33,7 @@ add_executable(selectAnomalousEventsWCastorVeto selectAnomalousEventsWCastorVeto
 add_executable(checkSignalLoss checkSignalLoss.cpp)
 add_executable(makeUnfoldingTrees makeUnfoldingTrees.cpp)
 add_executable(makeQEDUnfoldingTrees makeQEDUnfoldingTrees.cpp)
+add_executable(selectDiphotonForZSStudy        selectDiphotonForZSStudy.cpp)
 
 set_property(TARGET getEfficienciesLbL PROPERTY CXX_STANDARD 17)
 set_property(TARGET getEfficienciesQED PROPERTY CXX_STANDARD 17)
@@ -56,6 +57,7 @@ set_property(TARGET selectAnomalousEventsWCastorVeto  PROPERTY CXX_STANDARD 17)
 set_property(TARGET checkSignalLoss  PROPERTY CXX_STANDARD 17)
 set_property(TARGET makeUnfoldingTrees  PROPERTY CXX_STANDARD 17)
 set_property(TARGET makeQEDUnfoldingTrees  PROPERTY CXX_STANDARD 17)
+set_property(TARGET selectDiphotonForZSStudy  PROPERTY CXX_STANDARD 17)
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
@@ -91,3 +93,5 @@ target_link_libraries(selectAnomalousEventsWCastorVeto Analysis ${ROOT_LIBRARIES
 target_link_libraries(checkSignalLoss Analysis ${ROOT_LIBRARIES})
 target_link_libraries(makeUnfoldingTrees Analysis ${ROOT_LIBRARIES})
 target_link_libraries(makeQEDUnfoldingTrees Analysis ${ROOT_LIBRARIES})
+target_link_libraries(selectDiphotonForZSStudy Analysis ${ROOT_LIBRARIES})
+

@@ -54,7 +54,7 @@ maxDeltaR:              0.3
 
 ### Photon ID cuts:
 photonMinEt:                            2.0
-photonMaxEta:                         2.1
+photonMaxEta:                         2.
 photonMaxHoverEbarrel:          0.04596
 photonMaxHoverEendcap:       0.0590
 photonMaxEtaWidthBarrel:       0.0106
@@ -70,7 +70,7 @@ photonRejectConverted:           1
 
 ### Electron ID cuts:
 electronMinPt:                            2.0
-electronMaxEta:                         2.1
+electronMaxEta:                         2.2
 electronMaxNmissingHits:         1
 electronMaxHoverE_Barrel:         0.005
 electronMaxHoverE_Endcap:      0.005

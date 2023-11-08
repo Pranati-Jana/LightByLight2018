@@ -50,8 +50,7 @@ PhysObjects Event::GetPhysObjects(EPhysObjType type, TH1D *cutFlowHist)
      || type == EPhysObjType::kGeneralTrack
      || type == EPhysObjType::kL1EG
      || type == EPhysObjType::kZDC
-     || type == EPhysObjType::kPixelTrack
-     || type == EPhysObjType::kVertex){
+     || type == EPhysObjType::kPixelTrack){
     return physObjects.at(type);
   }
   else if(type == EPhysObjType::kGoodGenPhoton)       return GetGoodGenPhotons();
@@ -112,7 +111,8 @@ PhysObjects Event::GetPhotonsInAcceptance()
   physObjects.at(EPhysObjType::kPhotonInAcceptance).clear();
   
   for(auto photon : physObjects.at(EPhysObjType::kPhoton)){
-       
+    
+   
     // Check Et
     if(photon->GetEt() < config.params("photonMinEt")) continue;
     
@@ -135,14 +135,9 @@ PhysObjects Event::GetGoodPhotons()
   
   physObjects.at(EPhysObjType::kGoodPhoton).clear();
   
-   
   for(auto photon : physObjects.at(EPhysObjType::kPhoton)){
     
-    if(photon->FromConversion()){
-       physObjects.at(EPhysObjType::kGoodPhoton).push_back(photon);
-       continue;    
-     }  
-     // Check if photon converted
+    // Check if photon converted
     if(config.params("photonRejectConverted") && photon->IsConverted()) continue;
     
     // Check Et
@@ -184,7 +179,6 @@ PhysObjects Event::GetGoodPhotons()
   }
   physObjectsReady.at(EPhysObjType::kGoodPhoton) = true;
   return physObjects.at(EPhysObjType::kGoodPhoton);
-  
 }
 
 PhysObjects Event::GetElectronsInAcceptance()
@@ -282,34 +276,34 @@ PhysObjects Event::GetGoodMuons(TH1D *cutFlowHist)
     if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 0
     
     // Check pt
-    if(muon->GetPt() < config.params("muonMinPt")) continue;
+   // if(muon->GetPt() < config.params("muonMinPt")) continue;
    // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 1 
     
     if(fabs(muon->GetEta()) >= config.params("muonMaxEta")) continue;// ADD date: 29/12/2022, for the max eta cut
-  //  double absEta = fabs(muon->GetEta());
-   // if((absEta < config.params("muonMaxEtaEB")) && (muon->GetPt() < config.params("muonMinPtEB"))) continue;
-   // else if(((absEta > config.params("muonMinEtaEE")) && absEta < config.params("muonMaxEtaEE")) && (muon->GetPt() < config.params("muonMinPtEE"))) continue;
+    double absEta = fabs(muon->GetEta());
+    if((absEta < config.params("muonMaxEtaEB")) && (muon->GetPt() < config.params("muonMinPtEB"))) continue;
+    else if(((absEta > config.params("muonMinEtaEE")) && absEta < config.params("muonMaxEtaEE")) && (muon->GetPt() < config.params("muonMinPtEE"))) continue;
 
 
 //    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 3
 //Soft Muons ID
    //OneMuonStation tight   
      //if(config.params("muonOnestationTight") && muon->IsGood()) continue;
-   // if(muon->GetIsGood() == config.params("muonOnestationTight")) continue;
+    if(muon->GetIsGood() == config.params("muonOnestationTight")) continue;
     //if(muon->GetIsGlobal() < config.params("muonGlobal")) continue;
     //if(muon->GetIsTracker() < config.params("muonTracker")) continue;
     // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++);
    //Min innertracker layers
-   // if(muon->GetTrkLayers() <= config.params("muonMinTrkInnLayers")) continue; 
+    if(muon->GetTrkLayers() <= config.params("muonMinTrkInnLayers")) continue; 
    //Min. PixelLayers
-   // if(muon->GetPixelLayers() < config.params("muonMinTrkPixelLayers")) continue;
+    if(muon->GetPixelLayers() < config.params("muonMinTrkPixelLayers")) continue;
    //InnerTrack Quality
-   // if(config.params("muonTrkQuality") && muon->TrkQuality()) continue;
+    if(config.params("muonTrkQuality") && muon->TrkQuality()) continue;
     // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++);
    // max dxy
-  //  if(fabs(muon->GetInnerD0()) > config.params("muonMaxDxy")) continue;
+    if(fabs(muon->GetInnerD0()) > config.params("muonMaxDxy")) continue;
    //Max dz
-  //  if(fabs(muon->GetInnerDz()) > config.params("muonMaxDz")) continue;
+    if(fabs(muon->GetInnerDz()) > config.params("muonMaxDz")) continue;
 
 
     physObjects.at(EPhysObjType::kGoodMuon).push_back(muon);
@@ -359,35 +353,35 @@ PhysObjects Event::GetGoodGeneralTracks(TH1D *cutFlowHist)
     if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 1
     
     // Check eta
-    if(fabs(track->GetEta()) > config.params("trackMaxEta")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 2
+//    if(fabs(track->GetEta()) > config.params("trackMaxEta")) continue;
+  //  if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 2
     
     // Check distance from PV
-    if(fabs(track->GetDxy()) > config.params("trackMaxDxy")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 3
+   // if(fabs(track->GetDxy()) > config.params("trackMaxDxy")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 3
     
-    if(fabs(track->GetXYdistanceFromBeamSpot(dataset)) > config.params("trackMaxXYdistanceFromBS")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 4
+   // if(fabs(track->GetXYdistanceFromBeamSpot(dataset)) > config.params("trackMaxXYdistanceFromBS")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 4
     
-    if(fabs(track->GetDxy() / track->GetDxyErr()) > config.params("trackMaxDxyOverSigma")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 5
+  //  if(fabs(track->GetDxy() / track->GetDxyErr()) > config.params("trackMaxDxyOverSigma")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 5
     
-    if(fabs(track->GetDz()) > config.params("trackMaxDz")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 6
+   // if(fabs(track->GetDz()) > config.params("trackMaxDz")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 6
     
-    if(fabs(track->GetZdistanceFromBeamSpot(dataset)) > config.params("trackMaxZdistanceFromBS")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 7
+  //  if(fabs(track->GetZdistanceFromBeamSpot(dataset)) > config.params("trackMaxZdistanceFromBS")) continue;
+  //  if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 7
     
-    if(fabs(track->GetDz() / track->GetDzErr()) > config.params("trackMaxDzOverSigma")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 8
+   // if(fabs(track->GetDz() / track->GetDzErr()) > config.params("trackMaxDzOverSigma")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 8
     
-     //Check n hits
-    if(track->GetNvalidHits() < config.params("trackMinNvalidHits")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 9
+    // Check n hits
+   // if(track->GetNvalidHits() < config.params("trackMinNvalidHits")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 9
     
     // Check chi2
-    if(track->GetChi2() > config.params("trackMaxChi2")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 10
+   // if(track->GetChi2() > config.params("trackMaxChi2")) continue;
+  //  if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 10
     
     physObjects.at(EPhysObjType::kGoodGeneralTrack).push_back(track);
   }

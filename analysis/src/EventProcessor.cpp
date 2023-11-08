@@ -81,7 +81,16 @@ void EventProcessor::SetupBranches(string inputPath, vector<string> outputPaths,
   eventTree->SetBranchAddress("phoERight"             , &photonEright);
   eventTree->SetBranchAddress("phoHasConversionTracks", &photonIsConverted);
   eventTree->SetBranchAddress("pho_seedTime"          , &photonSeedTime);
-  
+  //Conversions 
+ // eventTree->SetBranchAddress("nConversions"          , &nConversions);
+  eventTree->SetBranchAddress("nAllTRk"          , &nAllTRk);
+  eventTree->SetBranchAddress("conversions_fittedpairMomentum_pt"          , &conversionPt);
+  eventTree->SetBranchAddress("conversions_refittedpairMomentum_eta"          , &conversionEta);
+  eventTree->SetBranchAddress("conversions_refittedpairMomentum_phi"          , &conversionPhi);
+  eventTree->SetBranchAddress("conversiosns_pairInvariantMass"          , &conversionMass);
+  eventTree->SetBranchAddress("nConversions"          , &conversionTracks); 
+ //
+  //
   eventTree->SetBranchAddress("nTower"                , &nPhysObjects.at(EPhysObjType::kCaloTower));
   eventTree->SetBranchAddress("CaloTower_hadE"        , &towerEnergyHad);
   eventTree->SetBranchAddress("CaloTower_emE"         , &towerEnergyEm);
@@ -362,10 +371,25 @@ shared_ptr<Event> EventProcessor::GetEvent(int iEvent)
     
     photon->hasConversionTracks = photonIsConverted->at(iPhoton);
     photon->seedTime            = photonSeedTime->at(iPhoton);
-    
+       
     currentEvent->physObjects.at(EPhysObjType::kPhoton).push_back(photon);
   }
+/*
+  for(size_t iConversion=0; iConversion<nAllTRk; iConversion++){
+    auto conversion = make_shared<PhysObject>();
+    conversion->fromConversion = true;
+    conversion->eta      = conversionEta->at(iConversion);
+    conversion->phi      = conversionPhi->at(iConversion);
+    conversion->pt       = conversionPt->at(iConversion);
+    conversion->mass     = conversionMass->at(iConversion);
+    conversion->nConversionTracks = conversionTracks->at(iConversion);
+
+    //currentEvent->physObjects.at(EPhysObjType::kPhoton).push_back(conversion);
+    
+}
+*/
   
+ 
   // Fill in collection of calo towers
   
   for(size_t iTower=0; iTower<nPhysObjects.at(EPhysObjType::kCaloTower); iTower++){

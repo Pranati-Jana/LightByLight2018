@@ -79,13 +79,13 @@ void fillHistograms(const unique_ptr<EventProcessor> &events,
       
       // Check basic cuts:
       if(electron->GetPt() < config.params("electronMinPt")) continue;
-      if(eta > config.params("electronMaxEta")) continue;
+     if(eta > config.params("electronMaxEta")) continue;
       if(physObjectProcessor.IsInCrack(*electron)) continue;
       if(physObjectProcessor.IsInHEM(*electron)) continue;
       
       hists.at("nMissingHits"+datasetName)->Fill(electron->GetNmissingHits());
       
-      if(electron->GetNmissingHits() > config.params("electronMaxNmissingHits")) continue;
+    //  if(electron->GetNmissingHits() > config.params("electronMaxNmissingHits")) continue;
       
       string subdet = "";
       if((eta < maxEtaEB)) subdet = "Barrel";

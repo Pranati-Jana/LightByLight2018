@@ -82,7 +82,14 @@ private:
   vector<float> *photonEright           = nullptr;
   vector<int>   *photonIsConverted      = nullptr;
   vector<float> *photonSeedTime         = nullptr;
-  
+//
+  int  nAllTRk;  
+  vector<int>   *conversionTracks             =nullptr;  
+  vector<float> *conversionPt            = nullptr;  
+  vector<float> *conversionEta           = nullptr;  
+  vector<float> *conversionPhi           = nullptr;  
+  vector<float> *conversionMass          = nullptr;  
+  //
   vector<float> *towerEta               = nullptr;
   vector<float> *towerPhi               = nullptr;
   vector<float> *towerEnergy            = nullptr;

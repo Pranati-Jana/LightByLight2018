@@ -1,21 +1,33 @@
 Universe              = vanilla
-executable            = runApplySelections.sh
-arguments             = $(ProcId) 3 4
+executable            = runSelectDiphotonEvents.sh
+arguments             = $(ProcId) 0 
 GetEnv                = True
 output                = output/$(ClusterId).$(ProcId).out
 error                 = error/$(ClusterId).$(ProcId).err
 log                   = log/$(ClusterId).log
 requirements 	      = (OpSysAndVer =?= "CentOS7")
 +JobFlavour           = "tomorrow"
-#queue 300
-#queue 100 
-#queue 268
-#queue 1000
-#queue 568
-#queue 2125
-#queue 274
-#queue 5010
-queue 1
-#queue  4338
-#queue 5272 
+
+## data (0)
+#queue 10400
+#queue 110
+#queue 937
+queue 999
+## MC SC (1)
+#queue 256
+#queue 162
+
+## MC QED FSR
+#queue 104
+
+## MC SL (2)
+#queue 243
+
+## MC LbL (3)
 #queue 4
+
+## MC CEP (4)
+#queue 4
+
+## MC ALPS (5)
+#queue 6

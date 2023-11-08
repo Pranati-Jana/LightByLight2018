@@ -1,7 +1,7 @@
 #!/bin/bash
 #configPath="/afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation.md"
 #configPath="/afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholds.md"
-configPath="/afs/cern.ch/work/j/jniedzie/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
+configPath="/afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
 
 inputPath=""
 outputPath=""
@@ -9,15 +9,16 @@ sampleName=""
 
 basePath="/eos/cms/store/group/phys_heavyions/rchudasa/lbyl_2018"
 baseOutputPath="/eos/cms/store/cmst3/group/lightbylight/analysis_jeremi"
-suffix="_31August22"
+suffix="_TriggerDielectron_27thMarch_GoodTrack"
 
 if [ $2 -eq 0 ]
 then
   sampleName="Data" # 10400 files
-  inputPath="${basePath}/skimmed_ntuples/data_doubleEG2_full_lumi/merged/merged_ntuples_${1}.root"
+  #inputPath="${basePath}/skimmed_ntuples/data_doubleEG2_full_lumi/merged/merged_ntuples_${1}.root"
+  inputPath="/eos/cms/store/cmst3/group/lightbylight/vtxInfo_Pranati/data_doubleEG2_full_lumi_11thFeb/merged/merged_ntuples_${1}.root"
   #inputPath=`sed "${1}q;d" /afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/input_list.txt`
 #  outputPath="${basePath}/analysis_ruchi/qed_data-MC_plots/data${suffix}"
-  outputPath="${baseOutputPath}/qed_data-MC_plots/data${suffix}"
+  outputPath="/eos/user/p/pjana/LByL/VertexInfo/data${suffix}"
 elif [ $2 -eq 1 ]
 then
   sampleName="QED_SC" # last chunk numer: 255
@@ -47,5 +48,5 @@ then
 else
   echo $inputPath 
   echo "Output File doesn't exist or is empty - running"
-  /afs/cern.ch/work/j/jniedzie/private/LightByLight2018/analysis/selectQEDEvents $configPath $inputPath $output $sampleName
+  /afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/selectQEDEvents $configPath $inputPath $output $sampleName
 fi

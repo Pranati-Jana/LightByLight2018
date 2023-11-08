@@ -1,6 +1,6 @@
 #!/bin/bash
 
-configPath="/afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation.md"
+configPath="/afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation.md"
 
 inputPath=""
 outputPath=""
@@ -8,14 +8,14 @@ sampleName=""
 
 basePath="/eos/cms/store/group/phys_heavyions/rchudasa/lbyl_2018"
 #basePath="/eos/cms/store/group/phys_diffraction/lbyl_2018"
-suffix="_23April21"
+suffix="_30thSep_2023"
 
 if [ $2 -eq 0 ]
 then
   sampleName="Data" # last chunk number: 7440, merged into 60 files
-  inputPath=`sed "${1}q;d" /afs/cern.ch/work/j/jniedzie/private/LightByLight2018/analysis/input_list.txt`
-#  inputPath="${basePath}/skimmed_ntuples/data_doubleEG2_complete/merged/merged_ntuples_${1}.root"
-  outputPath="${basePath}/analysis/photonIDplots/photonIDplots_data_new"
+#  inputPath=`sed "${1}q;d" /afs/cern.ch/work/j/jniedzie/private/LightByLight2018/analysis/input_list.txt`
+  inputPath="/eos/cms/store/cmst3/group/lightbylight/Final_afterTrigger/Data/Data_29thJune/merged/merged_ntuples_${1}.root"
+  outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/Photon_ID/Data"
   
 elif [ $2 -eq 1 ]
 then
@@ -54,5 +54,5 @@ then
   echo "File already exists, skipping"
 else
   echo "File doesn't exist or is empty - running"
-  /afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/preparePhotonIDplots $configPath $sampleName $inputPath $output 
+   /afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/preparePhotonIDplots $configPath $sampleName $inputPath $output 
 fi

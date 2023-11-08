@@ -123,6 +123,12 @@ int nVtx;
 float xVtx;
 float yVtx;
 float zVtx;
+int OneConversion;
+int TwoConversions;
+int Pho1_fromConversion;
+int Pho2_fromConversion;
+int nConversionTracks;
+/////////////////////
 /// initialise tree
 void InitTree(TTree *tr) {
   tr->Branch("run",                 &run,           "run/I");
@@ -222,6 +228,12 @@ void InitTree(TTree *tr) {
   tr->Branch("xVtx",                 &xVtx,                        "xVtx/F");
   tr->Branch("yVtx",                 &yVtx,                        "yVtx/F");
   tr->Branch("zVtx",                 &zVtx,                        "zVtx/F");
+  tr->Branch("OneConversion",                 &OneConversion,                        "OneConversion/I");
+  tr->Branch("TwoConversions",                 &TwoConversions,                        "TwoConversions/I");
+  tr->Branch("Pho1_fromConversion",            &Pho1_fromConversion,                        "Pho1_fromConversion/I");
+  tr->Branch("Pho2_fromConversion",                 &Pho2_fromConversion,                        "Pho2_fromConversion/I");
+  tr->Branch("nConversionTracks",                 &nConversionTracks,                             "nConversionTracks/I");
+///////////////////////////////
 }
 
 
@@ -316,6 +328,11 @@ void ResetVars() {
   yVtx = -999;
   zVtx = -999;
   ///
+ OneConversion = 0;
+ TwoConversions = 0;
+ Pho1_fromConversion = 0;
+ Pho2_fromConversion = 0;
+ nConversionTracks = -999;
 ///////////////////
 }
 
@@ -370,9 +387,9 @@ int main(int argc, char* argv[])
     ResetVars();  
     //////////////////////////////////////////////
     // Check trigger, It is comment out before, I remove it to check if this is for trigger,Date:27/12/2022
-   // if(sampleName != "Data"){
-//   if(!event->HasTrigger(kDoubleEG2noHF)) continue;
-  //  }
+//    if(sampleName != "Data"){
+  //  if(!event->HasTrigger(kDoubleEG2noHF)) continue;
+   // }
     //////////////////////////////////////////////////
     //Log(0)<<"After trigger "<<iEvent<<"\n";
     trigger_passed++;
@@ -407,15 +424,22 @@ int main(int argc, char* argv[])
     auto electrons = event->GetPhysObjects(EPhysObjType::kElectron);
     auto goodGenTracks = event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack);
     auto goodElectrons = event->GetPhysObjects(EPhysObjType::kGoodElectron);
-    auto muons     = event->GetPhysObjects(EPhysObjType::kGoodMuon);
+    auto muons     = event->GetPhysObjects(EPhysObjType::kMuon);
     std::cout << "Muon:" << std::endl;
     auto photon1   = event->GetPhysObjects(EPhysObjType::kGoodPhoton)[0];
     auto photon2   = event->GetPhysObjects(EPhysObjType::kGoodPhoton)[1];
+    std::cout << "Photon end:" << std::endl;
 
     auto caloTower = event->GetPhysObjects(EPhysObjType::kCaloTower);
     //Vertex info
     auto vertices = event->GetPhysObjects(EPhysObjType::kVertex);
+    std::cout<<"photon 1:"  << photon1->FromConversion() << std::endl;  
+    std::cout<<"photon 2:"  << photon2->FromConversion() << std::endl;  
+    if(photon2->FromConversion()){
+    std::cout << "Photon2Mass:" << photon2->GetMass() << std::endl;
+   }    
    
+   // OneConversion = (photon1->FromConversion()  photon2->FromConversion())     
    // event variables
     ok_neuexcl = (!event->HasAdditionalTowers());
     ok_castorexcl = (!event->HasCastorTowers());
@@ -428,8 +452,48 @@ int main(int argc, char* argv[])
     ok_chexcl_muons = (muons.size()==0);
     ok_chexcl_goodtracks = (goodGenTracks.size()==0);
     ok_chexcl_goodelectrons = (goodElectrons.size()==0);
+    //For Conversions
+    /*
+    double maxDeltaR = 0.2;
+    int nNonOverlappingTracks = 0;
+
+    for(auto &track : goodGenTracks){
+       bool overlapsPhoton1 = false;
+
+       if(photon1->FromConversion()){
+           if(sqrt(pow(track->GetEta() - photon1->GetEta(), 2) + pow(track->GetPhi() - photon1->GetPhi(), 2)) < maxDeltaR) overlapsPhoton1 = true;
+       }
+       bool overlapsPhoton2 = false;
+       if(photon2->FromConversion()){
+           if(sqrt(pow(track->GetEta() - photon2->GetEta(), 2) + pow(track->GetPhi() - photon2->GetPhi(), 2)) < maxDeltaR) overlapsPhoton2 = true;
+       }
+       if(!overlapsPhoton1 && !overlapsPhoton2) nNonOverlappingTracks++;
+    } 
+
+    ok_chexcl_goodtracks = (nNonOverlappingTracks==0);
     
+    nNonOverlappingTracks = 0;
+
+    for(auto &track : goodElectrons){
+       bool overlapsPhoton1 = false;
+       
+       if(photon1->FromConversion()){
+           if(sqrt(pow(track->GetEta() - photon1->GetEta(), 2) + pow(track->GetPhi() - photon1->GetPhi(), 2)) < maxDeltaR) overlapsPhoton1 = true;
+       }
+       bool overlapsPhoton2 = false;
+       if(photon2->FromConversion()){
+           if(sqrt(pow(track->GetEta() - photon2->GetEta(), 2) + pow(track->GetPhi() - photon2->GetPhi(), 2)) < maxDeltaR) overlapsPhoton2 = true;
+       }
+       if(!overlapsPhoton1 && !overlapsPhoton2) nNonOverlappingTracks++;
+    }
+
+    ok_chexcl_goodelectrons = (nNonOverlappingTracks==0);
+    std::cout << "Ex_goodtracks:" << ok_chexcl_goodtracks << endl;    
+    std::cout << "Ex_goodelectrons:" << ok_chexcl_goodelectrons << endl;    
+    */
     nTracks  = genTracks.size();
+ //   nMu = muons.size();
+//     muPt = muons->GetPt();
       
     if(sampleName == "Data"){
       zdc_energy_pos = event->GetTotalZDCenergyPos(); zdc_energy_neg = event->GetTotalZDCenergyNeg();
@@ -476,6 +540,7 @@ int main(int argc, char* argv[])
     phoEnergyCrysMax_1 = photon1->GetEnergyCrystalMax();
     phoSeedTime_1      = photon1->GetSeedTime();
     phoSigmaIEta_1     = photon1->GetSigmaEta2012();
+    Pho1_fromConversion = photon1->FromConversion();
     //
     double E4 = phoEnergyTop_1 + phoEnergyBottom_1 +  phoEnergyLeft_1 + phoEnergyRight_1;
     phoSwissCross_1 = 1 - (E4/phoEnergyCrysMax_1);
@@ -495,6 +560,7 @@ int main(int argc, char* argv[])
     phoEnergyCrysMax_2 = photon2->GetEnergyCrystalMax();
     phoSeedTime_2      = photon2->GetSeedTime();
     phoSigmaIEta_2     = photon2->GetSigmaEta2012();
+    Pho2_fromConversion = photon2->FromConversion();
 
     ///Add Muon info
      nMu = muons.size();
@@ -541,6 +607,9 @@ int main(int argc, char* argv[])
     pho_acop = 1 - (pho_dphi/3.141592653589);  
     std::cout << "deta:" << pho_deta << endl;
     std::cout << "dphi:" << pho_dphi << endl;
+    if (photon2->FromConversion()){
+    std::cout << "vSum_diPho_M_Pho2:" << vSum_diPho_M  << endl;
+    }    
 
    nPixelCluster = event->GetNpixelClusters();
    nPixelRecHits =  event->GetNpixelRecHits();
@@ -549,31 +618,8 @@ int main(int argc, char* argv[])
    cos_photon_pair_helicity0 = cosphotonpair(pho1, dipho, 0); // Boost of one photon in the pair direction (in the rest frame of the pair). The other will be at pi rads from the 1st.
    cos_photon_pair_helicity1 = cosphotonpair(pho1, dipho, 1); 
    costhetastar = costhetastar_CS(pho1,dipho);
- 
-
-      if(vSum_diPho_M>5){
-          diphomass_wozdc++;          
-          hist_wozdc->SetBinContent(4,diphomass_wozdc);
-      if(ok_chexcl==1){
-      charged_excl++;
-      hist_wozdc->SetBinContent(5,charged_excl);
-      if(ok_neuexcl==1){
-        neutral_excl++;
-        hist_wozdc->SetBinContent(6,neutral_excl);
-          if(vSum_diPho_Pt<1){
-            diphopt_wozdc++;
-            hist_wozdc->SetBinContent(7,diphopt_wozdc);
-            if(pho_acop<0.01){
-              acop_cut_wozdc++;
-              hist_wozdc->SetBinContent(8,acop_cut_wozdc);
-          }
-          }
-        }
-      }
-    }   
-  /*
- 
-   if(ok_chexcl==1){
+     
+    if(ok_chexcl==1){
       charged_excl++;
       hist->SetBinContent(4,charged_excl);
       hist_wozdc->SetBinContent(4,charged_excl);
@@ -595,22 +641,7 @@ int main(int argc, char* argv[])
 	}//mass
       }// neutral excl
     }//charged excl
-      
-*/
-  if(vSum_diPho_M>5 && ok_chexcl==1 && ok_neuexcl==1 && ok_zdcexcl==1){
-  zdc_excl++;
-  hist->SetBinContent(4,zdc_excl);
-  if(vSum_diPho_Pt<1){
-          diphopt++;
-          hist->SetBinContent(5,diphopt);
-          if(pho_acop<0.01){
-            acop_cut++;
-            hist->SetBinContent(6,acop_cut);
-          } //acop cut
-
-        } 
-     }  
-/*  
+    
     if(ok_chexcl==1 && ok_neuexcl==1 && ok_zdcexcl==1){
       zdc_excl++;
       hist->SetBinContent(6,zdc_excl);
@@ -627,7 +658,7 @@ int main(int argc, char* argv[])
 	}//dipho pt
       }//mass
     }//zdc cut
-*/    
+    
     tr->Fill(); 
   } //nevents
   Log(0) << "Number of events triggered:" << trigger_passed << "\n" ;

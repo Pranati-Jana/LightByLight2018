@@ -1,9 +1,9 @@
 #!/bin/bash
 
-userBasePath="/afs/cern.ch/work/r/rchudasa/private"
-configPath="${userBasePath}/LightByLight2018/analysis/configs/applySelections.md"
-#basePath="/eos/cms/store/group/phys_diffraction/lbyl_2018"
-basePath="/eos/cms/store/group/phys_heavyions/rchudasa/lbyl_2018"
+userBasePath="/afs/cern.ch/user/p/pjana/private/LightByLight/LByL/"
+configPath="${userBasePath}/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
+basePath="/eos/cms/store/group/phys_diffraction/lbyl_2018"
+#basePath="/eos/user/p/pjana/LByL/ntuples/QED_SC_Photos_New_24thJuly"
 sampleName=""
 
 # for the data:
@@ -77,8 +77,11 @@ then
   then
     echo "Data"
     sampleName="Data"
-    inputPath=`sed "${1}q;d" ${userBasePath}/LightByLight2018/analysis/input_list.txt`
-    outputPath="${basePath}/skimmed_ntuples/data_doubleEG2_full_lumi"
+    inputPath=`sed "${1}q;d" ${userBasePath}/LightByLight2018/analysis/input_list_withAllConversions.txt`
+    #inputPath=""
+    #outputPath="${basePath}/skimmed_ntuples/data_doubleEG2_full_lumi"
+    #outputPath="/eos/cms/store/cmst3/group/lightbylight/Test_Ruchi/data_doubleEG2_full_lumi_13thFeb"
+    outputPath="/eos/cms/store/cmst3/group/lightbylight/Final_afterTrigger/Data_29thJune"
   elif [ ${3} -eq 1 ] # QED SC, 255 chunks, max chunk number: 255
   then
     echo "QED SC"
@@ -89,9 +92,22 @@ then
     #inputPath="${basePath}/mcForests/mc_qed/QEDGammaGamma_5p02TeV_SuperChic/reco_mc_qed_sc_CastorInfo/210906_102658/0000/mc_HiForestAOD_${1}.root"
     #inputPath=`sed "${1}q;d" ${userBasePath}/LightByLight2018/analysis/input_qed_fsr.txt`
     #inputPath=`sed "${1}q;d" ${userBasePath}/LightByLight2018/analysis/qedMG5.txt`
-    inputPath=`sed "${1}q;d" ${userBasePath}/LightByLight2018/analysis/qedMG5_2FSR.txt`
+    #inputPath=`sed "${1}q;d" ${userBasePath}/LightByLight2018/analysis/qedMG5_2FSR.txt`
+    #TauTau Superchic sample
+    #inputPath="/eos/user/p/pjana/GammaGammaToTauTau/ntuples/MC_ntuples/MC_ntuples_Arash/ggTauTau_TuneCP5_5p02TeV_SuperChic_pythia8/reco_mc_SC/220707_112036/0000/mc_HiForestAOD_${1}.root"  #Date:21/01/2023
+    #GammaUPC sample
+    # inputPath="/eos/user/p/pjana/GammaGammaToTauTau/ntuples/MC_ntuples/GammaUPC/24thFeb_UPCEDFFkTSmearing/GammaGammatoTauTau_5p02TeV_gammaUPCEDFFkTSmearing-pLHE-v1/reco_mc_SC/230226_184903/0000/mc_HiForestAOD_${1}.root"
+    #inputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/GammaUPC/GammaGammatoTauTau_5p02TeV_gammaUPCEDFFkTSmearing-pLHE-v1/reco_mc_SC/230507_145915/0000/mc_HiForestAOD_${1}.root"
+#    inputPath="/eos/cms/store/cmst3/group/lightbylight/HIForest_QED_Photos_New_SC/24thJuly/QED_Photosplpl_5p02TeV_Superchic3/reco_mc_SC/230724_190910/0000/mc_HiForestAOD_${1}.root"
+    inputPath=`sed "${1}q;d" /eos/user/p/pjana/LByL/LByL_ZS_Test_2023/19thAugust/LbyLSignal_5p02TeV_SuperChic-v2/reco_mc_SC/230819_085059/LByL_New_ZS_ECAL_Th.txt`
+    #New ZS ECAL Th 2023
+    outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/19thAugust"
     #outputPath="${basePath}/skimmed_ntuples/mc_qed_sc_FSR_doubleEG2_full_lumi"
-    outputPath="${basePath}/skimmed_ntuples/mc_qedMG5_2FSR_doubleEG2_full_lumi"
+    #outputPath="${basePath}/skimmed_ntuples/mc_qedMG5_2FSR_doubleEG2_full_lumi"
+    #outputPath="/eos/user/p/pjana/LByL/GammaUPC"
+    #TauTau SC
+    #outputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/GammaUPC/afterTrigger/GammaGammatoTauTau_5p02TeV_gammaUPCEDFFkTSmearing-pLHE-v1_2/"
+    #outputPath="/eos/cms/store/cmst3/group/lightbylight/Final_afterTrigger/QED_SC_Photos"
   elif [ ${3} -eq 2 ] # CEP SC, 3 chunks, max chunk number: 3
   then
     echo "QED SL"
@@ -106,8 +122,33 @@ then
     sampleName="LbL"
     #inputPath="${basePath}/mc_lbl/ntuples_1034/ntuples_lbl_1034/ntuples_lbl_1034/200207_114802/0000/HiForestAOD_LbyL_${1}.root"
     #inputPath="${basePath}/mc_lbl/LbyLSignal_5p02TeV_SuperChic/reco_mc_lbl_try2/210420_063700/0000/mc_HiForestAOD_${1}.root"
-    inputPath="${basePath}/mcForests/mc_lbl/LbyLSignal_5p02TeV_SuperChic/reco_mc_lbl_CastorInfo/210906_102904/0000/mc_HiForestAOD_${1}.root"
-    outputPath="${basePath}/skimmed_ntuples/mc_lbl_sc_doubleEG2_full_lumi"
+    #inputPath="${basePath}/mcForests/mc_lbl/LbyLSignal_5p02TeV_SuperChic/reco_mc_lbl_CastorInfo/210906_102904/0000/mc_HiForestAOD_${1}.root"
+    #inputPath=`sed "${1}q;d" /eos/user/p/pjana/LByL/LByL_ZS_Test_2023/19thAugust/LbyLSignal_5p02TeV_SuperChic-v2/reco_mc_SC/230819_085059/LByL_New_ZS_ECAL_Th.txt`
+    #inputPath= "/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/Official_LByL_MC_Default_20thAugust/LbyLSignal_5p02TeV_SuperChic/reco_mc_lbl_try2/230820_192436/0000/mc_HiForestAOD_${1}.root"
+   #inputPath=`sed "${1}q;d" /eos/user/p/pjana/LByL/LByL_ZS_Test_2023/ZS_21stAugust_lblConfig/LbyLSignal_5p02TeV_SuperChic-v2/reco_mc_lbl_try2/230821_045152/ZS_lblConfig.txt` 
+   #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/Official_LByL_MC_Default_20thAugust/LbyLSignal_5p02TeV_SuperChic/reco_mc_lbl_try2/230821_061454/0000/mc_HiForestAOD_${1}.root"
+    #inputPath=`sed "${1}q;d" /eos/user/p/pjana/LByL/LByL_ZS_Test_2023/Default_LByL2018MC_GK_ForCheck/LbyLSignal_5p02TeV_SuperChic-v2/reco_mc_lbl_try2/230821_134937/Default_LByL2018MC_GK_ForCheck.txt`
+    #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/Default_LByL2018MC_GK_ForCheck_2/LbyLSignal_5p02TeV_SuperChic-v2/reco_mc_lbl_try2/230821_180224/0000/mc_HiForestAOD_${1}.root"
+    #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/Default_LbyL2018MC_25thAugust_GK/LbyLSignal_5p02TeV_SuperChic-v4/reco_mc_lbl_try2/230825_052534/0000/mc_HiForestAOD_${1}.root"
+    #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/Default_LbyL2018MC_25thAugust_GK"
+    #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/ZS_2023_GK_28thAugust_Realistic/LbyLSignal_5p02TeV_SuperChic-v4/reco_mc_lbl_try2/230828_123806/0000/mc_HiForestAOD_${1}.root"
+    #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/ZS_2023_GK_28thAugust_Realistic"
+#   inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/ZS_2023_GK_28thAugust_ZSHigh/LbyLSignal_5p02TeV_SuperChic-v4/reco_mc_lbl_try2/230828_155616/0000/mc_HiForestAOD_${1}.root" 
+   #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/HIForest/DoSR_LTH8p0_HTH10p0_NoZS_MIEB8p0_MIEE8p0/LbyLSignal_5p02TeV_SuperChic-v4/reco_mc_lbl_try2/230919_170916/0000/mc_HiForestAOD_${1}.root"
+   #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/HIForest/DoSR_LTH10p0_HTH14p0_NoZS_MIEB8p0_MIEE8p0/LbyLSignal_5p02TeV_SuperChic-v4/reco_mc_lbl_try2/230920_150633/0000/mc_HiForestAOD_${1}.root"
+   #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/HIForest/DoZS_MIEB8p0_MIEE8p0_HIEB2p5_HIEE3p0_CenterTow0/LbyLSignal_5p02TeV_SuperChic-v4/reco_mc_lbl_try2/230920_171135/0000/mc_HiForestAOD_${1}.root"
+   inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/HIForest/DoSR_LTH4p0_HTH8p0_NoZS_MIEB8p0_MIEE8p0/LbyLSignal_5p02TeV_SuperChic-v4/reco_mc_lbl_try2/230921_054545/0000/mc_HiForestAOD_${1}.root"
+  # inputPath=""
+ #  outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/Final_afterTrigger/LByLMC_SC/"   
+outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/GK_From_Chris/DoSR_LTH4p0_HTH8p0_NoZS_MIEB8p0_MIEE8p0"
+  # outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/GK_From_Chris/DoZS_MIEB8p0_MIEE8p0_HIEB2p5_HIEE3p0_CenterTow0"
+   #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/GK_From_Chris/DoSR_LTH10p0_HTH14p0_NoZS_MIEB8p0_MIEE8p0"
+#    outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/ZS_2023_GK_28thAugust_ZSHigh"
+    #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/Default_LByL2018MC_GK_ForCheck_1"
+    #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/21stAugust_Official_LbyL_Signal"
+#   outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/ZS_lblConfig"   
+#   outputPath=""
+# outputPath="${basePath}/skimmed_ntuples/mc_lbl_sc_doubleEG2_full_lumi"
   elif [ ${3} -eq 4 ] # QED SL, 253 chunks, max chunk number: 253
   then
     echo "CEP"
@@ -115,17 +156,22 @@ then
     #inputPath="${basePath}/mc_cep/ntuples_1034/ntuples_cep_1034/ntuples_cep_1034/200211_054704/0000/HiForestAOD_cep_${1}.root"
     #inputPath="${basePath}/mc_cep/ntuples_full_lumi/QCDDiphoton_5p02TeV_SuperChic/reco_mc_cep_full_lumi/200811_121848/0000/mc_HiForestAOD_${1}.root"
     #inputPath="${basePath}/mc_cep/QCDDiphoton_5p02TeV_SuperChic/reco_mc_cep_tryv2/210420_064351/0000/mc_HiForestAOD_${1}.root"
-    inputPath="${basePath}/mcForests/mc_cep/QCDDiphoton_5p02TeV_SuperChic/reco_mc_cep_CastorInfo/210906_103054/0000/mc_HiForestAOD_${1}.root"
-    outputPath="${basePath}/skimmed_ntuples/mc_cep_sc_doubleEG2_full_lumi"
-  elif [ ${3} -eq 5] # CEP incoh
+#    inputPath="${basePath}/mcForests/mc_cep/QCDDiphoton_5p02TeV_SuperChic/reco_mc_cep_CastorInfo/210906_103054/0000/mc_HiForestAOD_${1}.root"
+ #   outputPath="${basePath}/skimmed_ntuples/mc_cep_sc_doubleEG2_full_lumi"
+     #inputPath="/eos/cms/store/group/phys_diffraction/lbyl_2018/mcForests/mc_cepIncoh/gen_sim_cep_SC_incoh/reco_mc_cepIncoh_CastorInfo/211125_053225/0000/mc_HiForestAOD_${1}.root"
+     inputPath="/eos/cms/store/group/phys_diffraction/lbyl_2018/mcForests/mc_cepIncoh/gen_sim_cep_SC_incoh/reco_mc_cepIncoh_CastorInfo/211125_053225/0000/CEPIncoh_forest.root "
+     outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/Final_afterTrigger/CEP_Incoherent/mc_cepIncoh_sc_DoubleEG2"
+ 
+ elif [ ${3} -eq 5] # CEP incoh
   then
     echo "CEPIncoh"
     sampleName="CEPIncoh"
     #inputPath="${basePath}/mc_cep/ntuples_1034/ntuples_cep_1034/ntuples_cep_1034/200211_054704/0000/HiForestAOD_cep_${1}.root"
     #inputPath="${basePath}/mc_cep/ntuples_full_lumi/QCDDiphoton_5p02TeV_SuperChic/reco_mc_cep_full_lumi/200811_121848/0000/mc_HiForestAOD_${1}.root"
     #inputPath="${basePath}/mc_cep/QCDDiphoton_5p02TeV_SuperChic/reco_mc_cep_tryv2/210420_064351/0000/mc_HiForestAOD_${1}.root"
-    inputPath="/eos/cms/store/group/phys_diffraction/lbyl_2018/mcForests/mc_cepIncoh/gen_sim_cep_SC_incoh/reco_mc_cepIncoh_CastorInfo/211125_053225/0000/mc_HiForestAOD_${1}.root"   
-    outputPath="/eos/cms/store/group/phys_diffraction/lbyl_2018/skimmed_ntuples/mc_cepIncoh_sc_doubleEG2_full_lumi"
+    inputPath="${basePath}/mc_cepIncoh/gen_sim_cep_SC_incoh/reco_mc_cepIncoh_CastorInfo/211125_053225/0000/mc_HiForestAOD_${1}.root"   
+    outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/Final_afterTrigger/CEP_Incoherent/mc_cepIncoh_sc_DoubleEG2" 
+ #  outputPath="/eos/cms/store/group/phys_diffraction/lbyl_2018/skimmed_ntuples/mc_cepIncoh_sc_doubleEG2_full_lumi"
   else
     echo "Unknown option: ${3}"
   fi

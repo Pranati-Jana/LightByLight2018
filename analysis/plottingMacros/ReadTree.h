@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jun 27 15:55:03 2022 by ROOT version 6.20/04
+// Tue Nov  1 12:08:17 2022 by ROOT version 6.24/06
 // from TTree output_tree/
-// found on file: data_cosThetaStar.root
+// found on file: Data_diphoton.root
 //////////////////////////////////////////////////////////
 
 #ifndef ReadTree_h
@@ -95,6 +95,11 @@ public :
    Float_t         costhetastar;
    Float_t         cos_photon_pair_helicity0;
    Float_t         cos_photon_pair_helicity1;
+   Int_t           nMu;
+   Int_t           muCharge;
+   Float_t         muPt;
+   Float_t         muEta;
+   Float_t         muPhi;
 
    // List of branches
    TBranch        *b_run;   //!
@@ -170,6 +175,11 @@ public :
    TBranch        *b_costhetastar;   //!
    TBranch        *b_cos_photon_pair_helicity0;   //!
    TBranch        *b_cos_photon_pair_helicity1;   //!
+   TBranch        *b_nMu;   //!
+   TBranch        *b_muCharge;   //!
+   TBranch        *b_muPt;   //!
+   TBranch        *b_muEta;   //!
+   TBranch        *b_muPhi;   //!
 
    ReadTree(TTree *tree=0);
    virtual ~ReadTree();
@@ -190,9 +200,9 @@ ReadTree::ReadTree(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("data_cosThetaStar.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("Data_diphoton.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("data_cosThetaStar.root");
+         f = new TFile("Data_diphoton.root");
       }
       f->GetObject("output_tree",tree);
 
@@ -314,6 +324,11 @@ void ReadTree::Init(TTree *tree)
    fChain->SetBranchAddress("costhetastar", &costhetastar, &b_costhetastar);
    fChain->SetBranchAddress("cos_photon_pair_helicity0", &cos_photon_pair_helicity0, &b_cos_photon_pair_helicity0);
    fChain->SetBranchAddress("cos_photon_pair_helicity1", &cos_photon_pair_helicity1, &b_cos_photon_pair_helicity1);
+   fChain->SetBranchAddress("nMu", &nMu, &b_nMu);
+   fChain->SetBranchAddress("muCharge", &muCharge, &b_muCharge);
+   fChain->SetBranchAddress("muPt", &muPt, &b_muPt);
+   fChain->SetBranchAddress("muEta", &muEta, &b_muEta);
+   fChain->SetBranchAddress("muPhi", &muPhi, &b_muPhi);
    Notify();
 }
 

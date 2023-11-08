@@ -2,31 +2,62 @@
 
 #configPath="/afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation.md"
 #configPath="/afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholds.md"
-configPath="/afs/cern.ch/work/j/jniedzie/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
+#configPath="/afs/cern.ch/work/j/jniedzie/private/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
+configPath="/afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
 
 inputPath=""
 outputPath=""
 sampleName=""
-
+#Ruchi
 basePath="/eos/cms/store/group/phys_heavyions/rchudasa/lbyl_2018"
+#Pranati
+#basePath="/eos/cms/store/cmst3/group/lightbylight/Final_afterTrigger/Data_29thJune/merged"
 #basePathOutput="/eos/cms/store/group/phys_heavyions/rchudasa/lbyl_2018/analysis_ruchi/diphoton_data-MC_plots"
-basePathOutput="/eos/cms/store/cmst3/group/lightbylight/analysis_jeremi/diphoton_data-MC_plots"
-suffix="_31August22"
+basePathOutput="/eos/user/p/pjana/LByL/Test_Ruchintuple/31stJan_TriggerDiphoton"
+suffix="_diphoton_latestNtuple"
 
 if [ $2 -eq 0 ]
 then
   sampleName="Data" # 10400 files
-  inputPath="${basePath}/skimmed_ntuples/data_doubleEG2_full_lumi/merged/merged_ntuples_${1}.root"
+ # inputPath="${basePath}/merged_ntuples_${1}.root"
+  inputPath=`sed "${1}q;d" /eos/cms/store/cmst3/group/lightbylight/Pranati/HIForest_allConversions/HIForward/ntuples_data_ext/230618_233239/Data_HIForest_2018.txt` 
+ #Vettex info
+# inputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/vtxInfo_Pranati/data_doubleEG2_full_lumi_11thFeb/merged/merged_ntuples_${1}.root"
+#  inputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/Final_afterTrigger/Data/Data_29thJune/merged/merged_ntuples_${1}.root"
+  #EmptyBX
+  #inputPath="${basePath}/HIEmptyBX/ntuples/HIEmptyBX/ntuples_emptyBx_castor_pixel_branches/210803_040945/0000/data_emptyBx_HiForwardAOD_${1}.root"
   #inputPath=`sed "${1}q;d" /afs/cern.ch/work/r/rchudasa/private/LightByLight2018/analysis/input_list.txt`
-  outputPath="${basePathOutput}/data${suffix}"
+ # inputPath=`sed "${1}q;d" /afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/input_list.txt`
+  # SD Muon
+ # inputPath="${basePath}/HIForward/ntuples_data_ext/221121_170303/0000/data_HiForwardAOD_${1}.root"
+ # Standalone Muon, Pranati's ntuple  
+  #inputPath=`sed "${1}q;d" /afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/input_list_STMuon.txt`
+#  inputPath=`sed "${1}q;d" /eos/cms/store/cmst3/group/lightbylight/Pranati/HIForest_allConversions/HIForward/ntuples_data_ext/230618_233239/Data_HIForest_2018.txt`
+  #outputPath="${basePathOutput}/data${suffix}"
+ # outputPath="/eos/user/p/pjana/LByL/Final_Data/Data/Data${suffix}"
+  outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/CutFlow_study/Data_TriggerWithDiphoton${suffix}"
 elif [ $2 -eq 1 ]
 then
   sampleName="QED_SC" # last chunk numer: 255
   #inputPath="${basePath}/skimmed_ntuples/mc_qed_sc_doubleEG2_full_lumi/ntuples_loose_selections_${1}.root"
   #inputPath="${basePath}/skimmed_ntuples/mc_qed_sc_FSR_doubleEG2_full_lumi/merged/merged_ntuples_${1}.root"
   #inputPath="${basePath}/skimmed_ntuples/mc_qedMG5_FSR_doubleEG2_full_lumi/merged/merged_ntuples_${1}.root"
-  inputPath="${basePath}/skimmed_ntuples/mc_qedMG5_2FSR_doubleEG2_full_lumi/merged/merged_ntuples_${1}.root"
-  outputPath="${basePathOutput}/mc_qedMG5_2FSR${suffix}"
+  #inputPath="${basePath}/skimmed_ntuples/mc_qedMG5_2FSR_doubleEG2_full_lumi/merged/merged_ntuples_${1}.root"
+  #TauTau Check
+  #inputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/mc_TauTau_SC__16thFeb_Arash/ntuples_loose_selections_${1}.root"
+  #inputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/mc_TauTau_GammaUPC_UPCEDFFkTSmearing_26thFeb_GK/ntuples_loose_selections_${1}.root"
+  #inputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/GammaUPC/ntuples_loose_selections_${1}.root"
+#  inputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/GammaUPC/afterTrigger/GammaGammatoTauTau_5p02TeV_gammaUPCEDFFkTSmearing-pLHE-v1_2/ntuples_loose_selections_${1}.root"
+#inputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/mc_TauTau_SC__15thFeb_OfficialGk/ntuples_loose_selections_${1}.root" 
+   inputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/Final_afterTrigger/QED_SC_Photos/ntuples_loose_selections_${1}.root" 
+  #inputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/HIForest_QED_Photos_New_SC/24thJuly/QED_Photosplpl_5p02TeV_Superchic3/reco_mc_SC/230724_190910/0000/mc_HiForestAOD_${1}.root"
+  outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/CutFlow_study/TriggeredPassed_DiphotonEvents/QED_PHOTOS_${suffix}"
+  #outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/CutFlow_study/FirstTriggerToDiPhoSelectection/QED_PHOTOS_${suffix}"
+  #outputPath="${basePathOutput}/mc_qedMG5_2FSR${suffix}"
+  #TauTau Check
+  #outputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/afterDiphoton/mc_TauTau_SC${suffix}"
+  #outputPath="/eos/user/p/pjana/LByL/QED_POTOS_Official/Diphoton_Selection${suffix}"
+  #outputPath="/eos/user/p/pjana/LByL/TauTau_files_afterApplySelection/GammaUPC/afterTrigger_diphoton/mc_TauTau_GammaUPC${suffix}"
 elif [ $2 -eq 2 ]
 then
   sampleName="QED_SL" # last chunk numer: 253
@@ -37,11 +68,26 @@ elif [ $2 -eq 3 ]
 then
   sampleName="LbL" # 3 files only
   inputPath="${basePath}/skimmed_ntuples/mc_lbl_sc_doubleEG2_full_lumi/ntuples_loose_selections_${1}.root"
-  outputPath="${basePathOutput}/mc_lbl_sc${suffix}"
+#  inputPath="$/eos/cms/store/group/phys_diffraction/lbyl_2018/skimmed_ntuples/mc_lbl_sc_doubleEG2_full_lumi/ntuples_loose_selections_${1}.root"
+  #inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/19thAugust/merged/merged_ntuples_${1}.root" 
+ # inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/ZS_lblConfig/merged/merged_ntuples_${1}.root"
+ # inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/Default_LByL2018MC_GK_ForCheck/merged/merged_ntuples_${1}.root"
+#  inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_TriggerOnly/Default_LbyL2018MC_25thAugust_GK/ntuples_loose_selections_${1}.root"
+# inputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/Official_LByL_MC_Default_20thAugust/LbyLSignal_5p02TeV_SuperChic/reco_mc_lbl_try2/230821_061454/0000/mc_HiForestAOD_${1}.root"
+# inputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/Final_afterTrigger/LByLMC_SC//ntuples_loose_selections_${1}.root"
+ outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/CutFlow_study/TriggeredPassed_DiphotonEvents/mc${suffix}" 
+# outputPath="/eos/cms/store/cmst3/group/lightbylight/Pranati/CutFlow_study/mc${suffix}"
+#  outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_DiphotonSelection/mc${suffix}"
+  #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_DiphotonSelection/mc${suffix}"
+ #outputPath="${basePathOutput}/mc_lbl_sc${suffix}"
+  #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_DiphotonSelection/mc_SC_ZS_2023${suffix}"
+  #outputPath="/eos/user/p/pjana/LByL/LByL_ZS_Test_2023/after_DiphotonSelection/mc_SC_ZS_2023_lblConfig${suffix}"
+#  outputPath="/eos/user/p/pjana/LByL/LBLMC_afterDiphotonSelection/mc_lbl_sc${suffix}"
 elif [ $2 -eq 4 ]
 then
   sampleName="CEP" # 3 files only
-  inputPath="${basePath}/skimmed_ntuples/mc_cep_sc_doubleEG2_full_lumi/ntuples_loose_selections_${1}.root"
+ inputPath="${basePath}/skimmed_ntuples/mc_cep_sc_doubleEG2_full_lumi/ntuples_loose_selections_${1}.root"
+   
   outputPath="${basePathOutput}/mc_cep_sc${suffix}"
 elif [ $2 -eq 5 ]
 then
@@ -104,5 +150,5 @@ then
   echo "File already exists, skipping"
 else
   echo "File doesn't exist or is empty - running"
-  /afs/cern.ch/work/j/jniedzie/private/LightByLight2018/analysis/selectDiphotonEvents $configPath $inputPath $output $sampleName
+  /afs/cern.ch/user/p/pjana/private/LightByLight/LByL/LightByLight2018/analysis/selectDiphotonEvents $configPath $inputPath $output $sampleName
 fi
