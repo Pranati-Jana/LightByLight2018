@@ -53,7 +53,7 @@ maxTotalZDCenergyPerSide:    10000
 maxDeltaR:              0.3
 
 ### Photon ID cuts:
-photonMinEt:                            2.0
+photonMinEt:                            2.5
 photonMaxEta:                         2.2
 photonMaxHoverEbarrel:        0.04596
 photonMaxHoverEendcap:       0.0590
@@ -61,7 +61,7 @@ photonMaxEtaWidthBarrel:      0.0106
 photonMaxEtaWidthEndcap:      0.0272
 photonMaxSigmaEta2012Barrel:     999999
 photonMaxSigmaEta2012Endcap:  999999
-photonMinSwissCross:             999 
+photonMinSwissCross:            999999 
 photonMaxSwissCross:             0.95 
 diphotonMaxPt:                        1.0
 diphotonMaxRapidity:               9999999
@@ -70,7 +70,7 @@ diphotonMaxAco:                      0.01
 photonRejectConverted:           1
 
 ### Electron ID cuts:
-electronMinPt:                            2.0
+electronMinPt:                            2.5
 electronMaxEta:                         2.2
 electronMaxNmissingHits:         1
 electronMaxHoverE_Barrel:         0.005
@@ -153,7 +153,8 @@ noiseThresholdCASTOR_15:  58.37
 
 ### Muon ID Cuts:
 muonOnestationTight:   1
-muonMinPt:             2.0
+muonMinPt:             2.5
+muonMaxEta:            2.4
 muonMinTrkInnLayers:   5
 muonMinTrkPixelLayers: 1
 muonTrkQuality:        1
