@@ -52,7 +52,7 @@
 -2.2d0          ! [ymin]
 2.2d0          ! [ymax]
 5.0d0          ! [mmin]
-205d0          ! [mmax]
+17d0          ! [mmax]
 .true.        ! [gencuts] : Generate cuts below
 .true.        ! [scorr] : Include spin correlations
 .true.	      ! [fwidth] : Include finite width 
@@ -71,7 +71,7 @@
 2.2d0        ! [etaamax]
 -2.2d0       ! [etabmin]
 2.2d0        ! [etabmax]
-10d0        ! [acoabmax]
+0.01d0        ! [acoabmax]
 ****************************************************************************************
 ********************** 3 body final states : p(a) + p(b) + p(c) ************************
 ****************************************************************************************
