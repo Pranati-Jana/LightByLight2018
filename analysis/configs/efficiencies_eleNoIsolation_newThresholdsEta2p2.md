@@ -18,7 +18,7 @@ maxEvents: 9999999
 ### Criteria to match calo tower with photon SC for neutral exclusivity
 maxDeltaEtaEB:  0.15
 maxDeltaPhiEB:  0.7
-maxDeltaEtaEE:  0.15
+maxDeltaEtaEE:  0.15 
 maxDeltaPhiEE:  0.4
 
 ### Charged exclusivity cuts (GeV)
@@ -53,7 +53,7 @@ maxTotalZDCenergyPerSide:    10000
 maxDeltaR:              0.3
 
 ### Photon ID cuts:
-photonMinEt:                            2.5
+photonMinEt:                            2.0
 photonMaxEta:                         2.2
 photonMaxHoverEbarrel:        0.04596
 photonMaxHoverEendcap:       0.0590
@@ -61,7 +61,7 @@ photonMaxEtaWidthBarrel:      0.0106
 photonMaxEtaWidthEndcap:      0.0272
 photonMaxSigmaEta2012Barrel:     999999
 photonMaxSigmaEta2012Endcap:  999999
-photonMinSwissCross:            999999 
+photonMinSwissCross:             999 
 photonMaxSwissCross:             0.95 
 diphotonMaxPt:                        1.0
 diphotonMaxRapidity:               9999999
@@ -98,12 +98,12 @@ ecalHEMmaxPhi: -0.9
 
 ### Dont look at towers that are in very noisy region of EE
 maxEtaEEtower:      2.4
-
+maxEtaHEtower:      3.0
 ### Calorimeter noise thresolds (GeV)
 noiseThresholdEB:        0.7
 noiseThresholdEE:        3.0
 noiseThresholdHB:        2.8
-noiseThresholdHE:        1.0
+noiseThresholdHE:        1.0 
 noiseThresholdHFp:       6.0
 noiseThresholdHFm:       6.0
 
@@ -152,11 +152,16 @@ noiseThresholdCASTOR_14:  63.87
 noiseThresholdCASTOR_15:  58.37
 
 ### Muon ID Cuts:
-muonOnestationTight:   1
-muonMinPt:             2.5
 muonMaxEta:            2.4
+muonMaxEtaEB:          1.2
+muonMinEtaEE:          1.2
+muonMaxEtaEE:          2.4
+muonMinPtEB:           3.5
+muonMinPtEE:           1.5
+muonMinPt:             1.5
+muonOnestationTight:   0
 muonMinTrkInnLayers:   5
 muonMinTrkPixelLayers: 1
-muonTrkQuality:        1
+muonTrkQuality:        0
 muonMaxDxy:            0.3
 muonMaxDz:             20.0

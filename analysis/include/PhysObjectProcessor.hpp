@@ -19,14 +19,32 @@ public:
   
   /// Default destructor
   ~PhysObjectProcessor();
-  ///Returns deltaPhi
-  double GetdeltaPhi(const PhysObject &a, const PhysObject &b);
-  /// Returns ΔR=sqrt(Δη^2 + Δφ^2) between two PhysObjects
+  
+   ///Return TauTauPz
+   double GetTauTauPz(const PhysObject &a, const PhysObject &b);
+   ///Return TauTau
+   ///TLorentzVector GetTauTau(const PhysObject &a, const PhysObject &b);
+  ///Returns delaPhi
+   double GetdeltaPhi(const PhysObject &a, const PhysObject &b);
+  ///Returns DeltaEleR for ele and general trk
+   double GetDeltaEleR(const PhysObject &a, const PhysObject &b, const PhysObject &c);
+  ///Returns DeltaMuonR for muon and general trk
+   double GetDeltaMuonR(const PhysObject &a, const PhysObject &b); 
 
+  /// Returns ΔR=sqrt(Δη^2 + Δφ^2) between two PhysObjects
   double GetDeltaR(const PhysObject &a, const PhysObject &b);
   
   double GetDeltaR_SC(const PhysObject &a, const PhysObject &b);
-  
+  ///Returns muon lorentzvector
+  TLorentzVector Getmu(const PhysObject &a);
+  //Return electron Lorentzvector
+  TLorentzVector Getele(const PhysObject &a);
+  //REturn track Lorentzvector
+  TLorentzVector Gettrk(const PhysObject &a);
+  ///Returns a Lorentzvector of eletrk and mutrk
+  TLorentzVector GetEletrk(const PhysObject &a, const PhysObject &b);
+  TLorentzVector GetMutrk(const PhysObject &a, const PhysObject &b);
+
   /// Returns a lorentz vector which is a sum of provided objects, assuming they are photons
   TLorentzVector GetDiphoton(const PhysObject &a, const PhysObject &b);
   
@@ -41,7 +59,11 @@ public:
   
   ///Returns a lorentz vector which is a sum of provided objects,assuming they are electron+muon
   TLorentzVector GetEleMu(const PhysObject &a, const PhysObject &b);
+  ///Return a Lorentzvector which is sum of electron+track
+   TLorentzVector GetEleTrk(const PhysObject &a, const PhysObject &b);
 
+  ///Return ScalarPt
+  double GetScalarPt(const PhysObject &a, const PhysObject &b);
  
   /// Returns acoplanarity of pair of objects
   double GetAcoplanarity(const PhysObject &a, const PhysObject &b);

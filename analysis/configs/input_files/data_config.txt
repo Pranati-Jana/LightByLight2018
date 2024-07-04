@@ -1,0 +1,5 @@
+/afs/cern.ch/user/p/pjana/private/CMSSW_10_3_5/src/LightByLight2018/analysis/configs/applySelections.md 
+/eos/user/p/pjana/Other/Data/SigMu/Data_Sig_Mu_
+/eos/user/p/pjana/Other/Data/MuEle/Data_MuEle_
+/eos/user/p/pjana/Other/Data/MuMu/Data_MuMu_
+

@@ -14,6 +14,7 @@
 #include "TGraph.h"
 #include "TGraphAsymmErrors.h"
 #include "TF1.h"
+#include "TF2.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TEnv.h"
@@ -76,11 +77,13 @@ enum EDataset{
   kMCqedSL,
   kMClbl,
   kMCcep,
-  kMCqedFSR,
+  kMCgammaUPC,
+  kMCmumuFSR,
+  kMCTauTau,
   nDatasets
 };
 
-const vector<EDataset> datasets = { kData, kMCqedSC, kMCcep, kMCqedSL, kMClbl, kMCqedFSR };
+const vector<EDataset> datasets = { kData, kMCqedSC, kMCcep, kMCqedSL, kMClbl, kMCgammaUPC, kMCmumuFSR  };
 
 enum class EPhysObjType {
   kGenParticle,
@@ -103,8 +106,9 @@ enum class EPhysObjType {
   kPixelTrack,
   kGoodPixelTrack,
   kZDC,
-  //For Vtx info:Date: 09/02/2023
-  kVertex,
+  kGenParticleTau,
+  kGenParticleTauDaughter,
+
 };
 
 const vector<EPhysObjType> physObjTypes = {
@@ -128,7 +132,9 @@ const vector<EPhysObjType> physObjTypes = {
   EPhysObjType::kPixelTrack,
   EPhysObjType::kGoodPixelTrack,
   EPhysObjType::kZDC,
-  EPhysObjType::kVertex,
+  EPhysObjType::kGenParticleTau,
+  EPhysObjType::kGenParticleTauDaughter,
+
 };
 
 const map<EDataset, int> datasetColor = {
@@ -137,7 +143,9 @@ const map<EDataset, int> datasetColor = {
   {kMCqedSL             , kOrange+2 },
   {kMClbl               , kViolet+2 },
   {kMCcep               , kGreen+2  },
-  {kMCqedFSR            , kMagenta  },
+  {kMCgammaUPC          , kBlue+2  },
+  {kMCmumuFSR           , kYellow+2  },
+  {kMCTauTau            , kRed+2  },
 };
 
 const map<EDataset, string> datasetName = {
@@ -146,7 +154,9 @@ const map<EDataset, string> datasetName = {
   {kMCqedSL             , "QED_SL"  },
   {kMClbl               , "LbL"     },
   {kMCcep               , "CEP"     },
-  {kMCqedFSR            , "QED_FSR" },
+  {kMCgammaUPC          , "GAMMA_UPC"     },
+  {kMCmumuFSR           , "MUMU_FSR"     },
+  {kMCTauTau            , "TAUTAU"     },
 };
 
 const map<EDataset, string> datasetDescription = {
@@ -155,7 +165,9 @@ const map<EDataset, string> datasetDescription = {
   {kMCqedSL             , "QED MC (SL)"   },
   {kMClbl               , "LbL MC"        },
   {kMCcep               , "CEP MC"        },
-  {kMCqedFSR            , "QED MC (FSR)"  },
+  {kMCgammaUPC          , "GAMMAUPC MC"        },
+  {kMCmumuFSR           , "MUMUFSR   MC"        },
+  {kMCTauTau            , "TAUTAU"        },
 };
 
 const map<string, EDataset> datasetForName = {
@@ -164,7 +176,9 @@ const map<string, EDataset> datasetForName = {
   {"QED_SL" , kMCqedSL  },
   {"LbL"    , kMClbl    },
   {"CEP"    , kMCcep    },
-  {"QED_FSR", kMCqedFSR },
+  {"GAMMA_UPC" , kMCgammaUPC    },
+  {"MUMU_FSR" , kMCmumuFSR    },
+  {"TAUTAU" , kMCTauTau    },
 };
 
 inline tuple<double, double, double> GetBeamSpot(EDataset dataset)

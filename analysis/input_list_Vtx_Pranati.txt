@@ -4337,4 +4337,3 @@
 /eos/cms/store/cmst3/group/lightbylight/vtxInfo_Pranati/HIForward/ntuples_data_ext/230107_062959/0001/data_HiForwardAOD_1705.root
 /eos/cms/store/cmst3/group/lightbylight/vtxInfo_Pranati/HIForward/ntuples_data_ext/230107_062959/0001/data_HiForwardAOD_1710.root
 /eos/cms/store/cmst3/group/lightbylight/vtxInfo_Pranati/HIForward/ntuples_data_ext/230107_062959/0001/data_HiForwardAOD_1711.root
-/eos/cms/store/cmst3/group/lightbylight/vtxInfo_Pranati/HIForward/ntuples_data_ext/230107_062959/0001/log

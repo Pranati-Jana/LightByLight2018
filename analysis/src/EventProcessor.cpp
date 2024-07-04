@@ -45,21 +45,38 @@ void EventProcessor::SetupBranches(string inputPath, vector<string> outputPaths,
   }
   
   for(string outputPath : outputPaths) SetupOutputTree(outputPath);
-  
   for(auto &[trigger, name] : triggerNames){
     hltTree->SetBranchAddress(name.c_str()            , &triggerValues[trigger]);
   }
   eventTree->SetBranchAddress("nMC"                   , &nPhysObjects.at(EPhysObjType::kGenParticle));
-  eventTree->SetBranchAddress("mcEta"                 , &mcEta);
-  eventTree->SetBranchAddress("mcPhi"                 , &mcPhi);
-  eventTree->SetBranchAddress("mcEt"                  , &mcEt);
-  eventTree->SetBranchAddress("mcPID"                 , &mcPID);
-  //Event vertex info
-  eventTree->SetBranchAddress("nVtx"                  , &nPhysObjects.at(EPhysObjType::kVertex)); 
-  eventTree->SetBranchAddress("xVtx"                  , &xVtx); 
-  eventTree->SetBranchAddress("yVtx"                  , &yVtx); 
-  eventTree->SetBranchAddress("zVtx"                  , &zVtx); 
-  //
+  //eventTree->SetBranchAddress("mcEta"                 , &mcEta);
+  //eventTree->SetBranchAddress("mcPhi"                 , &mcPhi);
+  //eventTree->SetBranchAddress("mcEt"                  , &mcEt);
+  //eventTree->SetBranchAddress("mcPID"                 , &mcPID);
+  //GenTau
+ // eventTree->SetBranchAddress("nMC"                   , &nPhysObjects.at(EPhysObjType::kGenParticleTau));
+  
+  eventTree->SetBranchAddress("tauPt"                 , &tauPt);
+  eventTree->SetBranchAddress("tauEta"                , &tauEta);
+  eventTree->SetBranchAddress("tauPhi"                , &tauPhi);
+  eventTree->SetBranchAddress("tauE"                  , &tauE);
+  eventTree->SetBranchAddress("tauPID"                  , &tauPID);
+ // eventTree->SetBranchAddress("tauM"                  , &tauMass);
+
+//GenTAu daughter
+  eventTree->SetBranchAddress("nDaughter"             , &nPhysObjects.at(EPhysObjType::kGenParticleTauDaughter));
+  eventTree->SetBranchAddress("tau_daughterPt"        , &tau_daughterPt);
+ 
+  eventTree->SetBranchAddress("tau_daughterEta"       , &tau_daughterEta);
+
+  eventTree->SetBranchAddress("tau_daughterPhi"       , &tau_daughterPhi);
+  eventTree->SetBranchAddress("tau_daughterE"         , &tau_daughterE);
+  eventTree->SetBranchAddress("tau_daughter_pdgId"    , &tau_daughter_pdgId);
+  eventTree->SetBranchAddress("GenTau_Ele"            , &genTau_Ele);
+  eventTree->SetBranchAddress("GenTau_Mu"             , &genTau_Mu);
+//For plotting 
+ /////
+ //For withoutGen
   eventTree->SetBranchAddress("nPho"                  , &nPhysObjects.at(EPhysObjType::kPhoton));
   eventTree->SetBranchAddress("phoHoverE"             , &photonHoverE);
   eventTree->SetBranchAddress("phoEta"                , &photonEta);
@@ -81,16 +98,7 @@ void EventProcessor::SetupBranches(string inputPath, vector<string> outputPaths,
   eventTree->SetBranchAddress("phoERight"             , &photonEright);
   eventTree->SetBranchAddress("phoHasConversionTracks", &photonIsConverted);
   eventTree->SetBranchAddress("pho_seedTime"          , &photonSeedTime);
-  //Conversions 
- // eventTree->SetBranchAddress("nConversions"          , &nConversions);
-  eventTree->SetBranchAddress("nAllTRk"          , &nAllTRk);
-  eventTree->SetBranchAddress("conversions_fittedpairMomentum_pt"          , &conversionPt);
-  eventTree->SetBranchAddress("conversions_refittedpairMomentum_eta"          , &conversionEta);
-  eventTree->SetBranchAddress("conversions_refittedpairMomentum_phi"          , &conversionPhi);
-  eventTree->SetBranchAddress("conversiosns_pairInvariantMass"          , &conversionMass);
-  eventTree->SetBranchAddress("nConversions"          , &conversionTracks); 
- //
-  //
+  
   eventTree->SetBranchAddress("nTower"                , &nPhysObjects.at(EPhysObjType::kCaloTower));
   eventTree->SetBranchAddress("CaloTower_hadE"        , &towerEnergyHad);
   eventTree->SetBranchAddress("CaloTower_emE"         , &towerEnergyEm);
@@ -124,6 +132,12 @@ void EventProcessor::SetupBranches(string inputPath, vector<string> outputPaths,
   eventTree->SetBranchAddress("elePt"                 , &electronPt);
   eventTree->SetBranchAddress("eleEta"                , &electronEta);
   eventTree->SetBranchAddress("elePhi"                , &electronPhi);
+  eventTree->SetBranchAddress("eleDz"                , &electronDz);
+  //Date:20/08/2022, px,py,pz
+  //eventTree->SetBranchAddress("elePx"                 , &electronPx);
+  //eventTree->SetBranchAddress("elePy"                 , &electronPy);
+  //eventTree->SetBranchAddress("elePz"                 , &electronPz);
+  ///////////////////////////////////////////////////////////////////////
   eventTree->SetBranchAddress("eleHoverE"             , &electronHoverE);
   eventTree->SetBranchAddress("eleEoverP"             , &electronEoverP);
   eventTree->SetBranchAddress("elePFRelIsoWithEA"     , &electronRelIsoWithEA);
@@ -144,6 +158,25 @@ void EventProcessor::SetupBranches(string inputPath, vector<string> outputPaths,
   eventTree->SetBranchAddress("muPt"             , &muonPt);
   eventTree->SetBranchAddress("muEta"            , &muonEta);
   eventTree->SetBranchAddress("muPhi"            , &muonPhi);
+  eventTree->SetBranchAddress("muDz"             , &muonDz);
+  //Date:23/08/2022, for soft muon adding branches
+  //
+  eventTree->SetBranchAddress("muIsGlobal"          , &muonIsGlobal);
+  eventTree->SetBranchAddress("muIsTracker"         , &muonIsTracker);
+  eventTree->SetBranchAddress("muIsGood"            , &muonIsGood);
+  eventTree->SetBranchAddress("muTrkLayers"         , &muonTrkLayers);
+  eventTree->SetBranchAddress("muPixelLayers"       , &muonPixelLayers);
+  eventTree->SetBranchAddress("muTrkQuality"        , &muonTrkQuality);
+  eventTree->SetBranchAddress("muInnerD0"           , &muonInnerD0);
+  eventTree->SetBranchAddress("muInnerDz"           , &muonInnerDz);
+  ////////////////////////////////////////////////////////////////
+
+  //Date:20/08/2022, px,py,pz
+ // eventTree->SetBranchAddress("muPx"            , &muonPx);
+  //eventTree->SetBranchAddress("muPy"            , &muonPy);
+  //eventTree->SetBranchAddress("muPz"            , &muonPz);
+
+  ////////////////////////////////////////////////////////////////
 //  eventTree->SetBranchAddress("muHoverE"         , &muonHoverE);
 //  eventTree->SetBranchAddress("muPFRelIsoWithEA" , &muonRelIsoWithEA);
 //  eventTree->SetBranchAddress("mudEtaAtVtx"      , &muonDetaSeed);
@@ -164,7 +197,7 @@ void EventProcessor::SetupBranches(string inputPath, vector<string> outputPaths,
   eventTree->SetBranchAddress("run"             , &runNumber);
   eventTree->SetBranchAddress("lumis"           , &lumiSection);
   eventTree->SetBranchAddress("event"           , &eventNumber);
-//////////////////////////////////// 
+  
   eventTree->SetBranchAddress("nDisplacedTracks", &nDisplacedTracks);
   eventTree->SetBranchAddress("nPixelClusters"  , &nPixelClusters);
   eventTree->SetBranchAddress("nPixelRecHits"   , &nPixelRecHits);
@@ -319,7 +352,7 @@ shared_ptr<Event> EventProcessor::GetEvent(int iEvent)
   currentEvent->runNumber   = runNumber;
   currentEvent->lumiSection = lumiSection;
   currentEvent->eventNumber = eventNumber;
-  /////////////////////////////////  
+  
   currentEvent->nDisplacedTracks = nDisplacedTracks;
   currentEvent->nPixelRecHits = nPixelRecHits;
   currentEvent->nPixelClusters = nPixelClusters;
@@ -332,18 +365,51 @@ shared_ptr<Event> EventProcessor::GetEvent(int iEvent)
   // Fill in collection of gen particles
   for(int iGenPart=0; iGenPart<nPhysObjects.at(EPhysObjType::kGenParticle); iGenPart++){
     auto genParticle = make_shared<PhysObject>();
-    
+ /*   
     genParticle->eta   = mcEta->at(iGenPart);
     genParticle->etaSC = mcEta->at(iGenPart);
     genParticle->phi   = mcPhi->at(iGenPart);
     genParticle->etaSC   = mcEta->at(iGenPart);
     genParticle->phiSC   = mcPhi->at(iGenPart);
-    genParticle->et    = mcEt->at(iGenPart);
+    //genParticle->et    = mcEt->at(iGenPart);
+    genParticle->pt    = tauPt->at(iGenPart);
     genParticle->pdgID = mcPID->at(iGenPart);
+ //
+ */
+
+    genParticle->pt   = tauPt->at(iGenPart);
+    genParticle->eta  = tauEta->at(iGenPart);
+    genParticle->phi  = tauPhi->at(iGenPart);
+    genParticle->energy = tauE->at(iGenPart);
+   // genParticle->mass = tauMass->at(iGenPart);
+    genParticle->pdgID = tauPID->at(iGenPart);
+    
+    
     
     currentEvent->physObjects.at(EPhysObjType::kGenParticle).push_back(genParticle);
+//for plotting  
+}
+
+  //GetTauDaughter 
+  for(int iGenPartTauDaughter=0; iGenPartTauDaughter<nPhysObjects.at(EPhysObjType::kGenParticleTauDaughter); iGenPartTauDaughter++){
+    auto genParticleTauDaughter = make_shared<PhysObject>();
+ 
+    genParticleTauDaughter->pt   = tau_daughterPt->at(iGenPartTauDaughter);
+ 
+    genParticleTauDaughter->eta  = tau_daughterEta->at(iGenPartTauDaughter);
+ 
+    genParticleTauDaughter->phi  = tau_daughterPhi->at(iGenPartTauDaughter);
+
+    genParticleTauDaughter->energy = tau_daughterE->at(iGenPartTauDaughter);
+    genParticleTauDaughter->pdgID  = tau_daughter_pdgId->at(iGenPartTauDaughter);
+    //genParticleTauDaughter->genTau_ele = genTau_Ele->at(iGenPartTauDaughter);
+   //genParticleTauDaughter->genTau_mu = genTau_Mu->at(iGenPartTauDaughter);
+ 
+   currentEvent->physObjects.at(EPhysObjType::kGenParticleTauDaughter).push_back(genParticleTauDaughter);
+   //currentEvent->physObjects.at(EPhysObjType::kGenParticleTauDaughter).push_back(genParticleTauDaughter);
   }
-  
+
+///For plotting
   // Fill in collection of photon superclusters
   
   for(size_t iPhoton=0; iPhoton<nPhysObjects.at(EPhysObjType::kPhoton); iPhoton++){
@@ -371,25 +437,10 @@ shared_ptr<Event> EventProcessor::GetEvent(int iEvent)
     
     photon->hasConversionTracks = photonIsConverted->at(iPhoton);
     photon->seedTime            = photonSeedTime->at(iPhoton);
-       
+    
     currentEvent->physObjects.at(EPhysObjType::kPhoton).push_back(photon);
   }
-/*
-  for(size_t iConversion=0; iConversion<nAllTRk; iConversion++){
-    auto conversion = make_shared<PhysObject>();
-    conversion->fromConversion = true;
-    conversion->eta      = conversionEta->at(iConversion);
-    conversion->phi      = conversionPhi->at(iConversion);
-    conversion->pt       = conversionPt->at(iConversion);
-    conversion->mass     = conversionMass->at(iConversion);
-    conversion->nConversionTracks = conversionTracks->at(iConversion);
-
-    //currentEvent->physObjects.at(EPhysObjType::kPhoton).push_back(conversion);
-    
-}
-*/
   
- 
   // Fill in collection of calo towers
   
   for(size_t iTower=0; iTower<nPhysObjects.at(EPhysObjType::kCaloTower); iTower++){
@@ -460,8 +511,15 @@ shared_ptr<Event> EventProcessor::GetEvent(int iEvent)
     electron->pt           = electronPt->at(iElectron);
     electron->eta          = electronEta->at(iElectron);
     electron->phi          = electronPhi->at(iElectron);
+    electron->dz           = electronDz->at(iElectron);
     electron->hOverE       = electronHoverE->at(iElectron);
     electron->eOverP       = electronEoverP->at(iElectron);
+    //Date:20/08/2022, px,py,pz
+   // electron->px          = electronPx->at(iElectron);
+    //electron->py          = electronPy->at(iElectron);
+    //electron->pz          = electronPz->at(iElectron);
+    /////////////////////////////////////////////////////////////////
+   
     // TODO: fix missing RelIsoWithEA branch!!
 //    electron->relIsoWithEA = electronRelIsoWithEA->at(iElectron);
     electron->dEtaSeed     = electronDetaSeed->at(iElectron);
@@ -486,7 +544,25 @@ shared_ptr<Event> EventProcessor::GetEvent(int iEvent)
 //    muon->nMissingHits = muonNmissing->at(iMuon);
     muon->pt           = muonPt->at(iMuon);
     muon->eta          = muonEta->at(iMuon);
-    muon->phi          = muonPhi->at(iMuon);
+    muon->phi          = muonPhi->at(iMuon);   
+    muon->dz           = muonDz->at(iMuon);   
+    //Date:23/08/2022, soft muon ID
+    muon->trkLayers    = muonTrkLayers->at(iMuon);
+    muon->pixelLayers  = muonPixelLayers->at(iMuon);
+    muon->innerD0      = muonInnerD0->at(iMuon);
+    muon->innerDz      = muonInnerDz->at(iMuon);
+    muon->isGood       = muonIsGood->at(iMuon);
+    muon->isGlobal     = muonIsGlobal->at(iMuon);
+    muon->isTracker    = muonIsTracker->at(iMuon);
+    muon->trkQuality   = muonTrkQuality->at(iMuon); 
+    ////////////////////////////////////////////////////
+
+
+    //Date:20/08/2022,px,py,pz
+//    muon->px           = muonPx->at(iMuon);
+  //  muon->py           = muonPy->at(iMuon);
+    //muon->pz           = muonPz->at(iMuon);
+   //
 //    muon->hOverE       = muonHoverE->at(iMuon);
     // TODO: fix missing RelIsoWithEA branch!!
 //    muon->relIsoWithEA = muonRelIsoWithEA->at(iMuon);
@@ -501,18 +577,8 @@ shared_ptr<Event> EventProcessor::GetEvent(int iEvent)
     
     currentEvent->physObjects.at(EPhysObjType::kMuon).push_back(muon);
   }
- ///For Vtx info
- for(size_t iVertex=0; iVertex<nPhysObjects.at(EPhysObjType::kVertex); iVertex++){
-    auto vertex = make_shared<PhysObject>();
-    vertex->xVtx = xVtx->at(iVertex);
-    vertex->yVtx = yVtx->at(iVertex);
-    vertex->zVtx = zVtx->at(iVertex);
-    currentEvent->physObjects.at(EPhysObjType::kVertex).push_back(vertex);
 
-
-  }
-////////////////////////////////////
- 
+  
   // Fill in collection of L1 EG objects
   
   for(size_t iL1EG=0; iL1EG<nL1EGs; iL1EG++){

@@ -13,27 +13,23 @@ bool storeZDCtrees = true;//ZDC tree
 bool IsGoodForMuEle(Event &event)
 {
   // Check trigger
-  if(!(event.HasTrigger(kSingleMuOpenNoHF) or event.HasTrigger(kSingleEG3noHF)  or event.HasTrigger(kSingleEG5noHF))) return false;
-  //if(!(event.HasTrigger(kSingleMuOpenNoHF) or event.HasTrigger(kSingleEG3noHF) or event.HasTrigger(kSingleEG5noHF) or event.HasTrigger(kDoubleEG2noHF))) return false;
-  //if(!(event.HasTrigger(kSingleEG5noHF))) return false;
+  if(!(event.HasTrigger(kSingleMuOpenNoHF) or event.HasTrigger(kSingleEG5noHF))) return false;
+  //if(!(event.HasTrigger(kSingleMuOpenNoHF) or event.HasTrigger(kSingleEG3noHF) or event.HasTrigger(kSingleEG5noHF))) return false;
+//  if(!(event.HasTrigger(kSingleMuOpenNoHF))) return false;
   //Check one eltron, one muon and two track should be in an event
+  //Comment out this to produce the tree for unfolding
+  cout << "trigger:" << endl;
+  
   if(event.GetPhysObjects(EPhysObjType::kGoodElectron).size() != 1) return false;
   if(event.GetPhysObjects(EPhysObjType::kGoodMuon).size() != 1) return false;
   if(event.GetPhysObjects(EPhysObjType::kGoodGeneralTrack).size() !=2) return false;
   if(event.GetPhysObjects(EPhysObjType::kGoodMuon)[0]->GetCharge() ==
      event.GetPhysObjects(EPhysObjType::kGoodElectron)[0]->GetCharge()) return false;
-  
-  //if(event.GetPhysObjects(EPhysObjType::kGoodElectron)[0]->GetCharge() !=
-    // event.GetPhysObjects(EPhysObjType::kGeneralTrack)[0]->GetCharge()) return false;
-  //if(event.GetPhysObjects(EPhysObjType::kGoodMuon)[0]->GetCharge() !=
-    // event.GetPhysObjects(EPhysObjType::kGeneralTrack)[1]->GetCharge()) return false;
-  //if(event.GetPhysObjects(EPhysObjType::kGeneralTrack)[0]->GetCharge() ==
-    // event.GetPhysObjects(EPhysObjType::kGeneralTrack)[1]->GetCharge()) return false;
-
-  
+   
   //Exclusivity criteria
   if(event.HasAdditionalTowers()) return false;
-   
+  
+
   //Adding acoplanarity cut
  // double aco = physObjectProcessor.GetAcoplanarity(*event.GetPhysObjects(EPhysObjType::kGoodMuon)[0],
  //                                                  *event.GetPhysObjects(EPhysObjType::kGoodElectron)[0]);

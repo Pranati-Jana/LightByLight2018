@@ -27,7 +27,7 @@ public:
   double GetEt()        const;
   double GetPt()        const;
   double GetMomentum()  const;
-  
+  double GetMass()      const;  
   double GetEtaSC()     const;
   double GetEtSC()      const;
   double GetPhiSC()     const;
@@ -52,14 +52,10 @@ public:
   double GetDzErr()         const;
   double GetXYdistanceFromBeamSpot(EDataset dataset) const;
   double GetZdistanceFromBeamSpot(EDataset dataset)  const;
-//////////////////////////////////
-
   double GetVertexX()       const;
   double GetVertexY()       const;
   double GetVertexZ()       const;
-  ///////////////////////////////////
-  double GetMass()       const;
-  //
+  
   double GetEnergy()     const;
   double GetEnergyHad()  const;
   double GetEnergyEm()   const;
@@ -86,33 +82,33 @@ public:
   int  GetZside()     const;
   double GetSeedTime()      const;
   
-  //For soft muons
-  bool IsGood()     const;
+  ///For soft muons
+  int  GetIsGlobal()     const;
+  int  GetIsTracker()     const;
+  int  GetIsGood()     const;
   int  GetTrkLayers() const;
   int  GetPixelLayers() const;
   bool TrkQuality() const;
   double GetInnerD0() const;
-  double GetInnerDz() const;   
-/////////////////////////////////////////date:5/02/2023, Vertex info
-  int    GetNVertex() const;
-  double GetPVertexX() const;
-  double GetPVertexY() const;
-  double GetPVertexZ() const;
-///////////////////////////////////////////////////////////////////
-  int GetNConversionTracks() const;
-  bool FromConversion() const{
-  return fromConversion;
-}
+  double GetInnerDz() const;  
+ 
+  /// Date:18/08/2022; For deltaR match between e,muon with general trk
+  double GetTrkPhi()  const;
+  double GetTrkEta()  const;
+  double GetInnerEta() const;
+  double GetInnerPhi() const;
 
-   
+  ///Date:19/08/2022, px,py,pz
+  double GetPx()      const;
+  double GetPy()      const;
+  double GetPz()      const;
+  int GetTau_Ele()    const;
+  int GetTau_Mu()     const;
 private:
   double eta;       ///< Pseudorapidity
   double phi;       ///< Azimuthal angle
   double energy;    ///< Energy
-  double mass;    ///< Mass
-  bool fromConversion; 
-  int nConversionTracks;
- 
+  double mass;
   double etaSC;     ///< Pseudorapidity of the supercluster
   double etSC;      ///< Transverse energy of the supercluster
   double phiSC;     ///< Azimuthal angle of the supercluster
@@ -147,10 +143,8 @@ private:
   double d0;        ///< transverse impact parameter between track and beam spot
   double dxy, dz;   ///< distance between track and primary vertex
   double dxyErr, dzErr;///< uncertainties on dxy and dz
-  int nVtx;
-  double  xVtx, yVtx, zVtx;///< vertex coordinates
-  double vx, vy, vz;
- // double xVtx; 
+  double vx, vy, vz;///< vertex coordinates
+  
   double chargedIso;  ///< Isolation wrt. charged particles
   double photonIso;   ///< Isolation wrt. photons
   double neutralIso;  ///< Isolation wrt. neutral particles
@@ -164,15 +158,29 @@ private:
   int zSide;          ///< z-side for ZDC
   
   ///For soft muon
-  bool isGood;
+  int  isGlobal;
+  int  isTracker;
+  int  isGood;
   int  trkLayers;
   int  pixelLayers;
   bool trkQuality;
-  double innD0;
-  double innDz;
+  double innerD0;
+  double innerDz;
 
+  ///Date:18/08/2022, for deltaR eletrk,muontrk with generaltrk
+  double trkPhi;
+  double trkEta;
+  double innerEta;
+  double innerPhi;
+
+  ///date:19/08/2022 px,py,pz
+  double px;      ///<px
+  double py;      ///<py
+  double pz;      ///<pz
+  int    genTau_ele;
+  int    genTau_mu;
+  
   friend class EventProcessor;
-
   friend class PhysObjectProcessor;
 };
 

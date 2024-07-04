@@ -50,8 +50,9 @@ PhysObjects Event::GetPhysObjects(EPhysObjType type, TH1D *cutFlowHist)
      || type == EPhysObjType::kGeneralTrack
      || type == EPhysObjType::kL1EG
      || type == EPhysObjType::kZDC
-     || type == EPhysObjType::kPixelTrack
-     || type == EPhysObjType::kVertex){
+     || type == EPhysObjType::kGenParticleTau
+     || type == EPhysObjType::kGenParticleTauDaughter
+     || type == EPhysObjType::kPixelTrack){
     return physObjects.at(type);
   }
   else if(type == EPhysObjType::kGoodGenPhoton)       return GetGoodGenPhotons();
@@ -64,7 +65,7 @@ PhysObjects Event::GetPhysObjects(EPhysObjType type, TH1D *cutFlowHist)
   else if(type == EPhysObjType::kGoodMuon)            return GetGoodMuons(cutFlowHist);
   else if(type == EPhysObjType::kGoodGeneralTrack)    return GetGoodGeneralTracks(cutFlowHist);
   else if(type == EPhysObjType::kGoodPixelTrack)      return GetGoodPixelTracks(cutFlowHist);
-  
+ 
   Log(0)<<"ERROR -- unrecognized phys object type: "<<(int)type<<"!!!\n";
   return PhysObjects();
 }
@@ -112,7 +113,8 @@ PhysObjects Event::GetPhotonsInAcceptance()
   physObjects.at(EPhysObjType::kPhotonInAcceptance).clear();
   
   for(auto photon : physObjects.at(EPhysObjType::kPhoton)){
-       
+    
+   
     // Check Et
     if(photon->GetEt() < config.params("photonMinEt")) continue;
     
@@ -135,14 +137,9 @@ PhysObjects Event::GetGoodPhotons()
   
   physObjects.at(EPhysObjType::kGoodPhoton).clear();
   
-   
   for(auto photon : physObjects.at(EPhysObjType::kPhoton)){
     
-    if(photon->FromConversion()){
-       physObjects.at(EPhysObjType::kGoodPhoton).push_back(photon);
-       continue;    
-     }  
-     // Check if photon converted
+    // Check if photon converted
     if(config.params("photonRejectConverted") && photon->IsConverted()) continue;
     
     // Check Et
@@ -184,7 +181,6 @@ PhysObjects Event::GetGoodPhotons()
   }
   physObjectsReady.at(EPhysObjType::kGoodPhoton) = true;
   return physObjects.at(EPhysObjType::kGoodPhoton);
-  
 }
 
 PhysObjects Event::GetElectronsInAcceptance()
@@ -282,34 +278,37 @@ PhysObjects Event::GetGoodMuons(TH1D *cutFlowHist)
     if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 0
     
     // Check pt
-    if(muon->GetPt() < config.params("muonMinPt")) continue;
-   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 1 
-    
-    if(fabs(muon->GetEta()) >= config.params("muonMaxEta")) continue;// ADD date: 29/12/2022, for the max eta cut
-  //  double absEta = fabs(muon->GetEta());
-   // if((absEta < config.params("muonMaxEtaEB")) && (muon->GetPt() < config.params("muonMinPtEB"))) continue;
-   // else if(((absEta > config.params("muonMinEtaEE")) && absEta < config.params("muonMaxEtaEE")) && (muon->GetPt() < config.params("muonMinPtEE"))) continue;
-
+    if(muon->GetPt() < 1.5) continue;
+   double absEta = fabs(muon->GetEta());
+   if(absEta > 2.4) continue; 
+   if((absEta < config.params("muonMaxEtaEB")) && (muon->GetPt() < config.params("muonMinPtEB"))) {
+   continue;
+   }
+   else if(((absEta > config.params("muonMinEtaEE"))  && (muon->GetPt() < config.params("muonMinPtEE")))) 
+   {
+   continue;
+   }
 
 //    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 3
 //Soft Muons ID
    //OneMuonStation tight   
      //if(config.params("muonOnestationTight") && muon->IsGood()) continue;
-   // if(muon->GetIsGood() == config.params("muonOnestationTight")) continue;
+    if(muon->GetIsGood() == config.params("muonOnestationTight")) continue;
     //if(muon->GetIsGlobal() < config.params("muonGlobal")) continue;
     //if(muon->GetIsTracker() < config.params("muonTracker")) continue;
     // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++);
    //Min innertracker layers
-   // if(muon->GetTrkLayers() <= config.params("muonMinTrkInnLayers")) continue; 
+    if(muon->GetTrkLayers() <= config.params("muonMinTrkInnLayers")) continue; 
    //Min. PixelLayers
-   // if(muon->GetPixelLayers() < config.params("muonMinTrkPixelLayers")) continue;
+    if(muon->GetPixelLayers() < config.params("muonMinTrkPixelLayers")) continue;
    //InnerTrack Quality
-   // if(config.params("muonTrkQuality") && muon->TrkQuality()) continue;
+//    if(config.params("muonTrkQuality") && muon->TrkQuality()) continue;
+    if(muon->TrkQuality() == config.params("muonTrkQuality")) continue;
     // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++);
    // max dxy
-  //  if(fabs(muon->GetInnerD0()) > config.params("muonMaxDxy")) continue;
+    if(fabs(muon->GetInnerD0()) > config.params("muonMaxDxy")) continue;
    //Max dz
-  //  if(fabs(muon->GetInnerDz()) > config.params("muonMaxDz")) continue;
+    if(fabs(muon->GetInnerDz()) > config.params("muonMaxDz")) continue;
 
 
     physObjects.at(EPhysObjType::kGoodMuon).push_back(muon);
@@ -360,34 +359,34 @@ PhysObjects Event::GetGoodGeneralTracks(TH1D *cutFlowHist)
     
     // Check eta
     if(fabs(track->GetEta()) > config.params("trackMaxEta")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 2
+  //  if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 2
     
     // Check distance from PV
-    if(fabs(track->GetDxy()) > config.params("trackMaxDxy")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 3
+   // if(fabs(track->GetDxy()) > config.params("trackMaxDxy")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 3
     
-    if(fabs(track->GetXYdistanceFromBeamSpot(dataset)) > config.params("trackMaxXYdistanceFromBS")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 4
+   // if(fabs(track->GetXYdistanceFromBeamSpot(dataset)) > config.params("trackMaxXYdistanceFromBS")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 4
     
-    if(fabs(track->GetDxy() / track->GetDxyErr()) > config.params("trackMaxDxyOverSigma")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 5
+  //  if(fabs(track->GetDxy() / track->GetDxyErr()) > config.params("trackMaxDxyOverSigma")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 5
     
-    if(fabs(track->GetDz()) > config.params("trackMaxDz")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 6
+   // if(fabs(track->GetDz()) > config.params("trackMaxDz")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 6
     
-    if(fabs(track->GetZdistanceFromBeamSpot(dataset)) > config.params("trackMaxZdistanceFromBS")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 7
+  //  if(fabs(track->GetZdistanceFromBeamSpot(dataset)) > config.params("trackMaxZdistanceFromBS")) continue;
+  //  if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 7
     
-    if(fabs(track->GetDz() / track->GetDzErr()) > config.params("trackMaxDzOverSigma")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 8
+   // if(fabs(track->GetDz() / track->GetDzErr()) > config.params("trackMaxDzOverSigma")) continue;
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 8
     
-     //Check n hits
+    // Check n hits
     if(track->GetNvalidHits() < config.params("trackMinNvalidHits")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 9
+   // if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 9
     
     // Check chi2
-    if(track->GetChi2() > config.params("trackMaxChi2")) continue;
-    if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 10
+   // if(track->GetChi2() > config.params("trackMaxChi2")) continue;
+  //  if(cutFlowHist) cutFlowHist->Fill(cutFlowIndex++); // 10
     
     physObjects.at(EPhysObjType::kGoodGeneralTrack).push_back(track);
   }
@@ -506,21 +505,56 @@ bool Event::HasAdditionalTowers()
       if(subdetHad==kHFm && (ieta == -29 || ieta == -30)) continue;    
 
       if(tower->GetEnergy() > config.params("noiseThreshold"+caloName.at(subdetHad))){
-        return true;
+       //cout << "HF Eta:" << tower->GetEta() << endl;
+       //cout << "HF:" << tower->GetEnergy() << endl; 
+       return true;
       }
     }
+    
+    /*
     if(subdetHad==kHB || subdetHad==kHE){ // Check HB and HE exclusivity
       if(subdetHad==kHE && (ieta == 16 || ieta == -16 )) continue;
-      
       if(tower->GetEnergyHad() > config.params("noiseThreshold"+caloName.at(subdetHad))){
+       // cout << "HB or HE Eta:" << tower->GetEta() << endl;
+        //cout << "HB or HE :" << tower->GetEnergyHad() << endl;
+   
         return true;
       }
     }
+    */
+    /*********************************************************************************/
+    
+    if(subdetHad==kHB){
+      
+     // if(IsOverlappingWithGoodMuon(*tower)) continue; //This is to only apply HE deltaR cut not on HB
+   
+      if(tower->GetEnergyHad() > 2.8){
+        //cout << "EB Eta:" << tower->GetEta() << endl;
+       // cout << "HB from Event.cpp :" << tower->GetEnergyHad() << endl;
+        return true;
+      }
+    }
+    if(subdetHad==kHE){ // Check HE exclusivity
+       if(subdetHad==kHE && (ieta == 16 || ieta == -16 )) continue;
+      if(fabs(tower->GetEta()) > config.params("maxEtaHEtower")) continue;
+      if(IsOverlappingWithGoodMuon(*tower)) continue;
+     // if(tower->GetEnergyHad() == 0) continue;
+      
+      if(tower->GetEnergyHad() > 1.0){
+      // cout << "HE from Event.cpp :" << tower->GetEnergyHad() << endl;
+        return true;
+      }
+    }
+    
+    /*********************************************************************************/
+    
     if(subdetEm==kEB){
       if(IsOverlappingWithGoodPhoton(*tower)) continue;
       if(IsOverlappingWithGoodElectron(*tower)) continue;
       
       if(tower->GetEnergyEm() > GetEmThresholdForTower(*tower)){
+        //cout << "EB Eta:" << tower->GetEta() << endl;
+       // cout << "EB :" << tower->GetEnergyHad() << endl;
         return true;
       }
     }
@@ -536,7 +570,7 @@ bool Event::HasAdditionalTowers()
       }
     }
   }
-
+   
 /*    if(subdetHad==kHFp || subdetHad==kHFm){ // Check HF exclusivity
       if(tower->GetEnergy() > config.params("noiseThreshold"+caloName.at(subdetHad))){
         return true;
@@ -602,6 +636,7 @@ bool Event::HasAdditionalTowers(map<ECaloType, bool> &failingCalo)
       }
     }
     if((subdetHad==kHB || subdetHad==kHE) && !failingCalo[subdetHad]){ // Check HB and HE exclusivity
+    
       if(tower->GetEnergyHad() > config.params("noiseThreshold"+caloName.at(subdetHad))){
         failingCalo[subdetHad] = true;
         passes = false;
@@ -687,7 +722,33 @@ bool Event::IsOverlappingWithGoodElectron(const PhysObject &tower)
   }
   return overlapsWithElectron;
 }
+/**********************************************************************/
+//HE and HB Calo Tower matching with muon
+bool Event::IsOverlappingWithGoodMuon(const PhysObject &tower)
+{
+  bool overlapsWithMuon = false;
+  
+  ECaloType subdetHad = tower.GetTowerSubdetHad();
+  double maxDeltaEta = (subdetHad == kHB ) ? config.params("maxDeltaEtaEB") : config.params("maxDeltaEtaEE");
+  double maxDeltaPhi = (subdetHad == kHB ) ? config.params("maxDeltaPhiEB") : config.params("maxDeltaPhiEE");
+ 
+  for(auto muon : GetGoodMuons()){
+   //  if(tower.GetEnergyHad() == 0 ) continue; 
+    double deltaEta = fabs(muon->GetEta() - tower.GetEta());
+    double deltaPhi = fabs(TVector2::Phi_mpi_pi(muon->GetPhi() - tower.GetPhi()));
+    double deltaR = sqrt(deltaEta*deltaEta + deltaPhi*deltaPhi);
+    //cout << "Energy had:" << tower.GetEnergyHad()<< "   :deltaR from Event.cpp before cut: " << deltaR << endl;
+    if(deltaR < 1.0 && (tower.GetEnergyHad() < 3)){
+      overlapsWithMuon = true;
+     // cout << "Energy had:" << tower.GetEnergyHad()<<  ":deltaR from Event.cpp after cut: " << deltaR << endl;
+      break;
+    }
+  }
+  return overlapsWithMuon;
+}
 
+
+/************************************************************************/
 double Event::GetEmThresholdForTower(const PhysObject &tower)
 {
   double threshold = -1;

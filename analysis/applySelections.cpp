@@ -150,8 +150,18 @@ bool IsPassingAllLbLCuts(Event &event, bool doHighAco)
 bool IsGoodForSingleMuon(Event &event)
 {
   // Check trigger
-  if(!event.HasTrigger(kSingleMuOpenNoHF)) return false;
+  //if(!event.HasTrigger(kSingleMuOpenNoHF)) return false;
+  if(!event.HasTrigger(kSingleEG3noHF) && !event.HasTrigger(kSingleEG5noHF)) return false;
+  if(event.GetPhysObjects(EPhysObjType::kElectron).size() != 1) return false;
   
+//  auto electrons = event.GetPhysObjects(EPhysObjType::kElectron);
+ // if(electrons.size() != 2) return false;
+  
+  //TLorentzVector dielectron = physObjectProcessor.GetDiphoton(*photons[0], *photons[1]);
+ // if(diphoton.M() < 5.0) return false;
+  //if(diphoton.Pt() > 1.0) return false;
+  
+
   return true;
 }
 
@@ -161,14 +171,15 @@ bool IsGoodForMuEle(Event &event)
   // Check trigger
   //if(!event.HasTrigger(kSingleEG3noHF) && !event.HasTrigger(kSingleMuOpenNoHF)) return false;
  // if(!event.HasTrigger(kSingleMuOpenNoHF)) return false;
-  if(!(event.HasTrigger(kSingleMuOpenNoHF) or event.HasTrigger(kSingleEG3noHF))) return false;  
+  if(!(event.HasTrigger(kSingleMuOpenNoHF) or event.HasTrigger(kSingleEG3noHF) or event.HasTrigger(kSingleEG5noHF))) return false;  
 // Check Electrons
   if(event.GetPhysObjects(EPhysObjType::kElectron).size() != 1) return false;
   if(event.GetPhysObjects(EPhysObjType::kMuon).size() != 1) return false;
   if(event.GetPhysObjects(EPhysObjType::kGeneralTrack).size() != 2) return false;
   if(event.GetPhysObjects(EPhysObjType::kMuon)[0]->GetCharge() ==
      event.GetPhysObjects(EPhysObjType::kElectron)[0]->GetCharge()) return false;
-  
+
+
   return true;
 }
 
@@ -273,7 +284,7 @@ int main(int argc, char* argv[])
   
   // Loop over events
   for(int iEvent=0; iEvent<events->GetNevents(); iEvent++){
-    if(iEvent%100 == 0) cout<<"Processing event "<<iEvent<<endl;
+    if(iEvent%1000 == 0) cout<<"Processing event "<<iEvent<<endl;
     if(iEvent >= config.params("maxEvents")) break;
     
     auto event = events->GetEvent(iEvent);
@@ -298,15 +309,15 @@ int main(int argc, char* argv[])
       if(flag == "TauTau"){
         if(IsGoodForSingleMuon(*event))       events->AddEventToOutputTree(iEvent, outFilePaths[0], storeHLTtrees);
         if(IsGoodForMuEle(*event))            events->AddEventToOutputTree(iEvent, outFilePaths[1], storeHLTtrees);
-       // cout<<"test3"<<endl;
+   //     cout<<"test4"<<endl;
         if(IsGoodForMuMu(*event))             events->AddEventToOutputTree(iEvent, outFilePaths[2], storeHLTtrees);
-       // cout<<"test2"<<endl;
+     //   cout<<"test5"<<endl;
       }
     }
   }
   
   cout<<"Saving output trees"<<endl;
   for(string outFilePath : outFilePaths) events->SaveOutputTree(outFilePath);
-  cout<<"test4"<<endl; 
+//  cout<<"test4"<<endl; 
   return 0;
 }

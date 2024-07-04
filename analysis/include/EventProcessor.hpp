@@ -57,11 +57,22 @@ private:
   vector<float> *mcEt                   = nullptr;
   vector<float> *mcE                    = nullptr;
   vector<float> *mcPID                  = nullptr;
-  ///////// 
-  vector<float> *xVtx                   = nullptr;
-  vector<float> *yVtx                   = nullptr;
-  vector<float> *zVtx                   = nullptr;
-  /////////Date:7/02/2023
+
+  vector<float> *tauPt                  = nullptr;
+  vector<float> *tauEta                 = nullptr;
+  vector<float> *tauPhi                 = nullptr;
+  vector<float> *tauE                   = nullptr;
+  vector<float> *tauPID                   = nullptr;
+  
+  vector<float> *tau_daughterPt         = nullptr;
+  vector<float> *tau_daughterEta        = nullptr;
+
+  vector<float> *tau_daughterPhi        = nullptr;
+  vector<float> *tau_daughterE          = nullptr;
+  vector<float> *tau_daughter_pdgId     = nullptr;
+  vector<float> *genTau_Ele             = nullptr;
+  vector<float> *genTau_Mu              = nullptr;
+  
   vector<float> *photonHoverE           = nullptr;
   vector<float> *photonEta              = nullptr;
   vector<float> *photonPhi              = nullptr;
@@ -82,14 +93,7 @@ private:
   vector<float> *photonEright           = nullptr;
   vector<int>   *photonIsConverted      = nullptr;
   vector<float> *photonSeedTime         = nullptr;
-//
-  int  nAllTRk;  
-  vector<int>   *conversionTracks             =nullptr;  
-  vector<float> *conversionPt            = nullptr;  
-  vector<float> *conversionEta           = nullptr;  
-  vector<float> *conversionPhi           = nullptr;  
-  vector<float> *conversionMass          = nullptr;  
-  //
+  
   vector<float> *towerEta               = nullptr;
   vector<float> *towerPhi               = nullptr;
   vector<float> *towerEnergy            = nullptr;
@@ -120,6 +124,11 @@ private:
   vector<float> *electronPt             = nullptr;
   vector<float> *electronEta            = nullptr;
   vector<float> *electronPhi            = nullptr;
+  vector<float> *electronDz            = nullptr;
+//  Date:19/08/2022
+ // vector<float> *electronPx             = nullptr;
+ // vector<float> *electronPy             = nullptr;
+ // vector<float> *electronPz             = nullptr;
   vector<float> *electronHoverE         = nullptr;
   vector<float> *electronEoverP         = nullptr;
   vector<float> *electronRelIsoWithEA   = nullptr;
@@ -139,6 +148,25 @@ private:
   vector<float> *muonPt                 = nullptr;
   vector<float> *muonEta                = nullptr;
   vector<float> *muonPhi                = nullptr;
+  vector<float> *muonDz                 = nullptr;
+  //Date:23/08/2022, soft muon ID
+
+  vector<int> *muonIsGood                 = nullptr;
+  vector<int> *muonIsGlobal                 = nullptr;
+  vector<int> *muonIsTracker                 = nullptr;
+  vector<int> *muonTrkLayers              = nullptr;
+  vector<int> *muonPixelLayers            = nullptr;
+  vector<int> *muonTrkQuality             = nullptr;
+  vector<float> *muonInnerD0                = nullptr;
+  vector<float> *muonInnerDz                = nullptr;
+  ////////////////////////////////////////////////////////
+
+
+  //pz,Date:20/08/2022
+  //vector<float> *muonPx                 = nullptr;
+  //vector<float> *muonPy                 = nullptr;
+  //vector<float> *muonPz                 = nullptr;
+  /////////////////////////////////////////////////////////
 //  vector<float> *muonHoverE         = nullptr;
 //  vector<float> *muonRelIsoWithEA   = nullptr;
 //  vector<float> *muonDetaSeed       = nullptr;
@@ -196,7 +224,7 @@ private:
   uint runNumber = 0;
   uint lumiSection = 0;
   ULong64_t eventNumber = 0;
- /////////////////////
+  
   int nDisplacedTracks = 0;
   int nPixelClusters = 0;
   int nPixelRecHits = 0;

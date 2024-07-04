@@ -9,10 +9,7 @@ PhysObject::PhysObject() :
 eta(9999),
 phi(9999),
 energy(-1),
-fromConversion (false),
-mass(9999),//mass
-nConversionTracks(-9999),
-//
+mass(9999),
 etaSC(9999),
 etSC(-9999),
 phiSC(9999),
@@ -50,12 +47,7 @@ dzErr(-9999),
 vx(-9999),
 vy(-9999),
 vz(-9999),
-///////////////////
-nVtx(0),
-xVtx(-9999),
-yVtx(-9999),
-zVtx(-9999),
-///////////////////
+
 chargedIso(-9999),
 photonIso(-9999),
 neutralIso(-9999),
@@ -67,13 +59,29 @@ hasConversionTracks(false),
 seedTime(-9999),
 zSide(-9999),
 
-isGood(false),
-trkLayers(-9999),
-pixelLayers(-9999),
+isGlobal(-1),
+isTracker(-1),
+isGood(-1),
+trkLayers(-1),
+pixelLayers(-1),
 trkQuality(false),
-innD0(-9999),
-innDz(-9999)
+innerD0(-9999),
+innerDz(-9999),
+
+//date:18/08/2022, deltaR for eleTrk and muTrk with GneralTrk
+trkEta(9999),
+trkPhi(9999),
+
+//for muon
+innerEta(9999),
+innerPhi(9999),
 //
+genTau_ele(-999),
+genTau_mu(-999),
+//For px,py,pz
+px(9999),
+py(9999),
+pz(9999)
 {
   
 }
@@ -123,10 +131,6 @@ double PhysObject::GetPhi() const
 
 double PhysObject::GetEt()  const
 {
-  if(fromConversion){
-  return pt;
-  }
-
   if(et < 0) Log(1)<<"WARNING - carefull, et probably not set\n";
   return et;
 }
@@ -244,89 +248,55 @@ double PhysObject::GetXYdistanceFromBeamSpot(EDataset dataset) const
 {
   if(vx < -999 || vy < -999) Log(1)<<"WARNING - carefull, vx or vy probably not set\n";
   auto [bs_x, bs_y, bs_z] = GetBeamSpot(dataset);
-  double px = pt * cos(phi);
-  double py = pt * sin(phi);
+ // double px = pt * cos(phi);
+  //double py = pt * sin(phi);
   
-  return (-(vx - bs_x) * py + (vy - bs_y) * px) / pt;
-//  return sqrt(pow(bs_x - vx, 2) + pow(bs_y - vy, 2));
+ // return (-(vx - bs_x) * py + (vy - bs_y) * px) / pt;
+  return sqrt(pow(bs_x - vx, 2) + pow(bs_y - vy, 2));
 }
 
 double PhysObject::GetZdistanceFromBeamSpot(EDataset dataset) const
 {
   if(vz < -999) Log(1)<<"WARNING - carefull, vz probably not set\n";
   auto [bs_x, bs_y, bs_z] = GetBeamSpot(dataset);
-  double px = pt * cos(phi);
-  double py = pt * sin(phi);
+//  double px = pt * cos(phi);
+ // double py = pt * sin(phi);
   
   double theta = 2*atan(exp(-eta));
-  double pz = p * cos(theta);
+//  double pz = p * cos(theta);
   
-  return (vz - bs_z) - ((vx - bs_x) * px + (vy - bs_y) * py) / pt * pz / pt;
-//  return fabs(bs_z - vz);
+  //return (vz - bs_z) - ((vx - bs_x) * px + (vy - bs_y) * py) / pt * pz / pt;
+  return fabs(bs_z - vz);
 }
 
 double PhysObject::GetVertexX() const
 {
-  if(vx < -999) Log(1)<<"WARNING - carefull, vy probably not set\n";
+  if(vx < -999) Log(1)<<"WARNING - carefull, vx probably not set\n";
   return vx;
 }
- 
+
 double PhysObject::GetVertexY() const
 {
-  if(vy < -999) Log(1)<<"WARNING - carefull, vz probably not set\n";
+  if(vy < -999) Log(1)<<"WARNING - carefull, vy probably not set\n";
   return vy;
 }
- 
+
 double PhysObject::GetVertexZ() const
 {
   if(vz < -999) Log(1)<<"WARNING - carefull, vz probably not set\n";
   return vz;
 }
-//////////////////////////////////////
-int PhysObject::GetNVertex() const
-{
-  if(nVtx < 0) Log(1)<<"WARNING - carefull, vx probably not set\n";
-  return nVtx;
-}
 
-double PhysObject::GetPVertexX() const
-{
-  if(xVtx < -999) Log(1)<<"WARNING - carefull, vy probably not set\n";
-  return xVtx;
-}
-
-double PhysObject::GetPVertexY() const
-{
-  if(yVtx < -999) Log(1)<<"WARNING - carefull, vz probably not set\n";
-  return yVtx;
-}
-
-double PhysObject::GetPVertexZ() const
-{
-  if(zVtx < -999) Log(1)<<"WARNING - carefull, vz probably not set\n";
-  return zVtx;
-}
- 
-/////////////////////////////////////////////////////////////////////////////
-//
-double PhysObject::GetMass()     const
-{
-
-  if(mass<0) Log(1)<<"WARNING - carefull, mass probably not set\n";
-  return mass;
-}
-
-////
 double PhysObject::GetEnergy()     const
 {
-//  if(fromConversion){
- // return mass;
- // }  
-
   if(energy<0) Log(1)<<"WARNING - carefull, energy probably not set\n";
   return energy;
 }
-
+double PhysObject::GetMass()     const
+{
+  if(mass<0) Log(1)<<"WARNING - carefull, energy probably not set\n";
+  return mass;
+}
 double PhysObject::GetEnergyHad() const
 {
   if(energyHad < -999) Log(1)<<"WARNING - carefull, energyHad probably not set\n";
@@ -354,8 +324,7 @@ double PhysObject::GetEnergyCrystalBottom() const
 double PhysObject::GetEnergyCrystalLeft() const
 {
   if(energyLeft < -999) Log(1)<<"WARNING - carefull, energyLeft probably not set\n";
- 
- return energyLeft;
+  return energyLeft;
 }
 
 double PhysObject::GetEnergyCrystalRight() const
@@ -442,21 +411,34 @@ int PhysObject::GetZside() const
 }
 /****************************************/
 //Soft muon
-
-bool PhysObject::IsGood() const
+int PhysObject::GetIsGlobal() const
 {
+  if(isGlobal < 0) Log(1)<<"WARNING - carefull, TrkLayers probably not set\n";
+  return isGlobal;
+}
+
+int PhysObject::GetIsTracker() const
+{
+  if(isTracker < 0) Log(1)<<"WARNING - carefull, TrkLayers probably not set\n";
+  return isTracker;
+}
+
+
+int PhysObject::GetIsGood() const
+{
+  if(isGood < 0) Log(1)<<"WARNING - carefull, TrkLayers probably not set\n";
   return isGood;
 }
 
 int PhysObject::GetTrkLayers() const
 {
-  if(trkLayers < -999) Log(1)<<"WARNING - carefull, TrkLayers probably not set\n";
+  if(trkLayers < 0) Log(1)<<"WARNING - carefull, TrkLayers probably not set\n";
   return trkLayers;
 }
 
 int PhysObject::GetPixelLayers() const
 {
-  if(pixelLayers < -999) Log(1)<<"WARNING - carefull, PixelLayers probably not set\n";
+  if(pixelLayers < 0) Log(1)<<"WARNING - carefull, PixelLayers probably not set\n";
   return pixelLayers;
 }
 
@@ -467,22 +449,71 @@ bool PhysObject::TrkQuality() const
 
 double PhysObject::GetInnerD0() const
 {
-  if(innD0 < -999) Log(1)<<"WARNING - carefull, innerdxy probably not set\n";
-  return innD0;
+  if(innerD0 < -999) Log(1)<<"WARNING - carefull, innerdxy probably not set\n";
+  return innerD0;
 }
 
 double PhysObject::GetInnerDz() const
 {
-  if(innDz < -999) Log(1)<<"WARNING - carefull, innerdz probably not set\n";
-  return innDz;
+  if(innerDz < -999) Log(1)<<"WARNING - carefull, innerdz probably not set\n";
+  return innerDz;
+}
+/*******************************************************/
+
+
+
+//Date:18/08/2022, for deltaR between eTrkand muTrk with egneralTrk
+double PhysObject::GetTrkEta() const
+{
+  if(trkEta>999) Log(1)<<"WARNING - carefull, trketa probably not set\n";
+  return trkEta;
+}
+
+double PhysObject::GetTrkPhi() const
+{
+  if(trkPhi>999) Log(1)<<"WARNING - carefull, trkphi probably not set\n";
+  return trkPhi;
+}
+
+//for muon
+double PhysObject::GetInnerPhi() const
+{
+  if(innerPhi>999) Log(1)<<"WARNING - carefull, innerphi probably not set\n";
+  return innerPhi;
+}
+
+double PhysObject::GetInnerEta() const
+{
+  if(innerEta>999) Log(1)<<"WARNING - carefull, innereta probably not set\n";
+  return innerEta;
 }
 //
-int  PhysObject::GetNConversionTracks() const
+//Date:19/08/2022, px,py,pz
+
+double PhysObject::GetPx() const
 {
-  if(nConversionTracks < 0) Log(1)<<"WARNING - carefull, innerdz probably not set\n";
-  return nConversionTracks;
+  if(px < -999) Log(1)<<"WARNING - carefull, px probably not set\n";
+  return px;
 }
 
+double PhysObject::GetPy() const
+{
+  if(py < -999) Log(1)<<"WARNING - carefull, py probably not set\n";
+  return py;
+}
 
-
-/*******************************************************/
+double PhysObject::GetPz() const
+{
+  if(pz < -999) Log(1)<<"WARNING - carefull, pz probably not set\n";
+  return pz;
+}
+int  PhysObject::GetTau_Ele() const
+{
+if(genTau_ele < -999)Log(1)<<"WARNING - carefull, innerdz probably not set\n";
+return genTau_ele;
+}
+int  PhysObject::GetTau_Mu() const
+{
+if(genTau_mu < -999)Log(1)<<"WARNING - carefull, innerdz probably not set\n";
+return genTau_mu;
+}
