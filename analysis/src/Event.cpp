@@ -569,6 +569,7 @@ bool Event::HasAdditionalTowers()
         return true;
       }
     }
+
   }
    
 /*    if(subdetHad==kHFp || subdetHad==kHFm){ // Check HF exclusivity

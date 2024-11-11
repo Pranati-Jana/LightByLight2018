@@ -268,19 +268,12 @@ int main(int argc, char* argv[])
 ////////
   //  if(event->GetPhysObjects(EPhysObjType::kGoodElectron).size() == 1 & (event->GetPhysObjects(EPhysObjType::kGoodMuon).size() == 1)){
     
-/*    if(event->GetPhysObjects(EPhysObjType::kGoodElectron).size() != 1) continue;
-    cout << "Test3:" << endl;
-    if(event->GetPhysObjects(EPhysObjType::kGoodMuon).size() != 1) continue;
-    if(event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack).size() !=2) continue;
-    if(event->HasAdditionalTowers()) continue;
- */  
+ 
     if(!(event->HasTrigger(kSingleMuOpenNoHF) || event->HasTrigger(kSingleEG5noHF))) continue;    
     ok_singleMuon = (event->HasTrigger(kSingleMuOpenNoHF));
     ok_singleEG3 = (event->HasTrigger(kSingleEG3noHF));
     ok_singleEG5 = (event->HasTrigger(kSingleEG5noHF));
-  //  cout << "ok_singleMuon:" << ok_singleMuon << endl;    
-  //  cout << "ok_singleEG3:" << ok_singleEG3 << endl;    
-  //  cout << "ok_singleEG5:" << ok_singleEG5 << endl;    
+    
    hist->SetBinContent(1,trigger_passed);  
      //cout << "Event number:" << iEvent << endl;
     trigger_passed++;
@@ -319,7 +312,7 @@ int main(int argc, char* argv[])
  
 
     //if(EleMu_acop < 0.01) continue;
-
+    cout << "Event number:" << iEvent << endl;
    // extra_track_info
     int nextratracks =0;
     for (auto trk : goodgenTracks) {
@@ -405,8 +398,9 @@ int main(int argc, char* argv[])
       tower_HF_Plus = tower_hf_plus;
       
      }
-      //cout << "HF Plus:" << tower_HF_Plus << endl;
+      
      }
+     //cout << "HF Plus:" << tower_HF_Plus << endl;
      // HF minus towers
      if( (tower_eta) > - 5.2 && (tower_eta) < -3.15 && tow->GetEnergy()> 0.0 ){
     
@@ -417,8 +411,9 @@ int main(int argc, char* argv[])
       tower_HF_Minus = tower_hf_minus;
       
      }
-     //cout << "HF Minus:" << tower_HF_Minus << endl;
+     
      }
+     //cout << "HF Minus:" << tower_HF_Minus << endl;
      
 
 

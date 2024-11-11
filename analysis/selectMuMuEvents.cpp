@@ -50,7 +50,8 @@ float vSum_Rapidity;
 float MuMu_dphi;
 float MuMu_acop;
 int ok_neuexcl;
-
+float E_gamma1;
+float E_gamma2;
 int ok_chexcl;
 int ok_chexcl_extratracks;
 int ok_chexcl_goodtracks;
@@ -113,7 +114,8 @@ void InitTree(TTree *tr) {
   tr->Branch("MuMu_dphi",          &MuMu_dphi,   "MuMu_dphi/F");
   tr->Branch("MuMu_acop",          &MuMu_acop,   "MuMu_acop/F");
   tr->Branch("ok_neuexcl",          &ok_neuexcl,   "ok_neuexcl/I");
-  
+  tr->Branch("E_gamma1",          &E_gamma1,   "E_gamma1/I");
+  tr->Branch("E_gamma2",          &E_gamma2,   "E_gamma2/I");
 
   tr->Branch("ok_chexcl",           &ok_chexcl,       "ok_chexcl/I");
   tr->Branch("ok_chexcl_extratracks",           &ok_chexcl_extratracks,       "ok_chexcl_extratracks/I");
@@ -173,6 +175,8 @@ void ResetVars() {
   MuMu_dphi = 0;
   MuMu_acop = 0;
   ok_neuexcl = 0;
+  E_gamma1 = -9999;
+  E_gamma2 = -9999;
 
   ok_chexcl = 0;
   ok_chexcl_extratracks = 0;
@@ -353,8 +357,8 @@ int main(int argc, char* argv[])
     mu2.SetPtEtaPhiM(Mu_Pt2,Mu_Eta2,Mu_Phi2,muMass);
     MuMu = mu1 + mu2;
     vSum_M = MuMu.M();
-    if(vSum_M<8) continue;
-    if(vSum_M>60) continue;
+   // if(vSum_M<8) continue;
+   // if(vSum_M>60) continue;
     vSum_Pt = MuMu.Pt();
     vSum_Phi = MuMu.Phi();    
     Scalar_Pt = (Mu_Pt1 + Mu_Pt2);    
@@ -362,6 +366,8 @@ int main(int argc, char* argv[])
     MuMu_dphi = getDPHI(Mu_Phi1,Mu_Phi2); 
     MuMu_acop = 1 - (MuMu_dphi/3.141592653589);     
     vSum_Pz = MuMu.Pz();
+    E_gamma1 = 0.5*vSum_M*exp(vSum_Rapidity);
+    E_gamma2 = 0.5*vSum_M*exp((-1)*vSum_Rapidity);
     neutral_excl++;
     /////////////////
    int ntowers = 0;
