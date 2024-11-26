@@ -440,9 +440,9 @@ int main(int argc, char* argv[])
   // }
   } //nevents
   Log(0) << "Number of events triggered:" << trigger_passed << "\n" ;
-  Log(0) << "One Good electron:" << TwoGoodMuon << "\n";
-  Log(0) << "One Good electron and one good muon:" << twoGoodMuon << "\n";
-  Log(0) << "Oppositely charged electron and muon:" << oppositelyCharged_2Muon << "\n";
+  Log(0) << "Two Good muon:" << TwoGoodMuon << "\n";
+  Log(0) << "Two Good muon:" << twoGoodMuon << "\n";
+  Log(0) << "Oppositely charged 2muon:" << oppositelyCharged_2Muon << "\n";
   Log(0) << "Two good general tracks:" << twoGoodGeneralTracks << "\n";
   Log(0) << "Neutral exclusivity:" << neutral_excl << "\n";
   
