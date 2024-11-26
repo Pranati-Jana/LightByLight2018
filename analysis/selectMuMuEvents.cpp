@@ -56,8 +56,10 @@ int ok_chexcl;
 int ok_chexcl_extratracks;
 int ok_chexcl_goodtracks;
 int ok_trigger;
+int ok_trigger_noHFveto;
 int   nTracks;
 int ok_singleMuon;
+int ok_singleMuon_noHFveto;
 int ok_singleEG3;
 int ok_singleEG5;
 float deltaRtrack_electron;
@@ -121,9 +123,8 @@ void InitTree(TTree *tr) {
   tr->Branch("ok_chexcl_extratracks",           &ok_chexcl_extratracks,       "ok_chexcl_extratracks/I");
   tr->Branch("ok_chexcl_goodtracks",           &ok_chexcl_goodtracks,       "ok_chexcl_goodtracks/I");
   tr->Branch("ok_trigger",                 &ok_trigger, "ok_trigger/I");
-  tr->Branch("ok_singleMuon",                 &ok_trigger, "ok_singleMuon/I");
-  tr->Branch("ok_singleEG3",                 &ok_trigger, "ok_singleEG3/I");
-  tr->Branch("ok_singleEG5",                 &ok_trigger, "ok_singleEG5/I");
+  tr->Branch("ok_singleMuon",                 &ok_singleMuon, "ok_singleMuon/I");
+  tr->Branch("ok_singleMuon_noHFveto",                 &ok_singleMuon_noHFveto, "ok_singleMuon_noHFveto/I");
   tr->Branch("deltaRtrack_electron",                 &deltaRtrack_electron, "deltaRtrack_electron/F");
   tr->Branch("deltaRtrack_muon",                 &deltaRtrack_muon, "deltaRtrack_muon/F");
   tr->Branch("zdc_energy_pos",             &zdc_energy_pos,         "zdc_energy_pos/F");
@@ -183,8 +184,7 @@ void ResetVars() {
   ok_chexcl_goodtracks = 0;
   ok_trigger = 0;
   ok_singleMuon = 0;
-  ok_singleEG3 = 0;
-  ok_singleEG5 = 0;
+  ok_singleMuon_noHFveto = 0;
   deltaRtrack_electron = -999;
   deltaRtrack_muon = -999;
   zdc_energy_pos = 0;
@@ -271,9 +271,12 @@ int main(int argc, char* argv[])
     if(event->HasAdditionalTowers()) continue;
  */  
     if(!(event->HasTrigger(kSingleMuOpenNoHF))) continue;    
+   // if(!(event->HasTrigger(kSingleMuOpenNoHFveto))) continue;    //To calculate HF veto part of singlemuon trigger
+    ok_singleMuon_noHFveto = (event->HasTrigger(kSingleMuOpenNoHFveto)); //To calculate HF veto part of singlemuon trigger
     ok_singleMuon = (event->HasTrigger(kSingleMuOpenNoHF));
    
-  //  cout << "ok_singleMuon:" << ok_singleMuon << endl;    
+//    cout << "ok_singleMuon_noHFveto:" << ok_singleMuon_noHFveto << endl;   
+  //  cout << "ok_singleMuon:" << ok_singleMuon << endl; 
   //  cout << "ok_singleEG3:" << ok_singleEG3 << endl;    
   //  cout << "ok_singleEG5:" << ok_singleEG5 << endl;    
     trigger_passed++;
@@ -300,8 +303,8 @@ int main(int argc, char* argv[])
     if(event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack).size() !=2) continue;
     twoGoodGeneralTracks++;
     hist->SetBinContent(5,twoGoodGeneralTracks);
-    
-   // if(event->HasAdditionalTowers()) continue;
+     
+    //if(event->HasAdditionalTowers()) continue;
     
     hist->SetBinContent(6,neutral_excl);
 
@@ -349,7 +352,7 @@ int main(int argc, char* argv[])
     Mu_E2         = goodMuon2->GetEnergy();
     Mu_charge2    = goodMuon2->GetCharge();
     ///
-    //cout << "Muon Eta:" << Mu_Eta << endl;
+    //cout << "Muon Eta:" << Mu_Eta1 << ";"<< Mu_Eta2  << endl;
     double eleMass = 0.5109989461e-3;
     double muMass = 105.6583755e-3;
     TLorentzVector mu1, mu2, MuMu;
@@ -375,12 +378,18 @@ int main(int argc, char* argv[])
 
    double max_tower_had = -1.0;
    for(auto tow: towers){
+      // cout << "tower eta:" <<  tow->GetEta() << endl;
+ 
+   }
+
+ /*  for(auto tow: towers){
     
      tower_eta = tow->GetEta();
      tower_phi = tow->GetPhi();
      tower_em = tow->GetEnergyEm();
      if( fabs(tower_eta) > 1.41 && fabs(tower_eta) < 3 && tow->GetEnergyHad()>0.0 ){
-      /**********Any HE tower > 1.0GeV*/
+    */
+	     /**********Any HE tower > 1.0GeV*/
       /*
       tower_had_test = tow->GetEnergyHad();
       tower_had = tow->GetEnergyHad();
@@ -393,7 +402,7 @@ int main(int argc, char* argv[])
      genTree->Fill();
      */
     /********************Leading HE towers******************/
-     double current_tower_had = tow->GetEnergyHad();
+  /*   double current_tower_had = tow->GetEnergyHad();
      if(current_tower_had > max_tower_had) { 
       max_tower_had = current_tower_had;
       tower_had = max_tower_had;  
@@ -414,7 +423,7 @@ int main(int argc, char* argv[])
     // //cout  << " Had energy HB: "<< tower_had <<  ":deltaR muon and Had: " <<  getDR(tower_eta,tower_phi,goodMuon1->GetEta(),goodMuon1->GetPhi()) << endl;
     //  }
     // ntowers++;    
-    } 
+    } */
     
      // start filling EleMu information here ........................................
   

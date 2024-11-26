@@ -1,11 +1,7 @@
 #!/bin/bash
 
-userBasePath="/afs/cern.ch/user/p/pjana/private/DiTau2018/analysis/"
-#configPath="${userBasePath}/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation.md"
-#configPath="${userBasePath}/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholds.md"
-#configPath="${userBasePath}/LightByLight2018/analysis/configs/efficiencies_HFVeto_withEleIsolatioNewThresholds.md"
-#configPath="${userBasePath}/LightByLight2018/analysis/configs/efficiencies_HFVeto_withEleIsolatioNewThresholdsEta2p2.md"
-configPath="/afs/cern.ch/user/p/pjana/private/DiTau2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
+userBasePath="/afs/cern.ch/user/p/pjana/private/DiTau2018/LightByLight2018/analysis"
+configPath="/afs/cern.ch/user/p/pjana/private/DiTau2018/LightByLight2018/analysis/configs/efficiencies_eleNoIsolation_newThresholdsEta2p2.md"
 
 inputPath=""
 outputPath=""
@@ -13,9 +9,8 @@ sampleName=""
 
 
 basePath="/eos/user/p/pjana/GammaGammaToTauTau"
-#basePath="/dpm/indiacms.res.in/home/cms/store/user/pjana/t3store3/Data"
 
-suffix="_MuMu_HE1To3DeltaR1_el9"
+suffix="_MuMu_HFp6.0HFm6.0_eta2.9To5.2_test"
 
 if [ $2 -eq 0 ]
 then
@@ -24,7 +19,8 @@ then
   #inputPath=`sed "${1}q;d" ${userBasePath}/LightByLight2018/analysis/input_list_Vtx_Pranati.txt`
   inputPath=`sed "${1}q;d" /eos/cms/store/cmst3/group/lightbylight/Pranati/HIForest_allConversions/HIForward/ntuples_data_ext/230618_233239/Data_HIForest_2018.txt`
   #inputPath=`sed "${1}q;d" /eos/cms/store/group/phys_heavyions/pjana/Pranati_ForDiTau_Analysis/Data_OneFourthLumi/HIForward/ntuples_data_ext/240427_053549/Data_OnefourthLumi.txt`
-  outputPath="/eos/user/p/pjana/RootFileTauTau/AllSelections_FromSelectEleMuScript/CutFlowHistAdded_18thMarch/MuonEndcapPt1.5GeV_HE1To3DeltaRMuonHE1/Data_FullLumi_${suffix}"
+  #outputPath="/eos/user/p/pjana/RootFileTauTau/AllSelections_FromSelectEleMuScript/CutFlowHistAdded_18thMarch/MuonEndcapPt1.5GeV_HE1To3DeltaRMuonHE1/Data_FullLumi_${suffix}"
+  outputPath="/eos/user/p/pjana/RootFileTauTau/ForNEE_SF_HFonly_Study_ggmumu/Data_FullLumi_${suffix}"
 elif [ $2 -eq 1 ]
 then 
   sampleName="QED_SC"
@@ -69,9 +65,11 @@ outputPath="/eos/user/p/pjana/RootFileTauTau/AllSelections_FromSelectEleMuScript
 elif [ $2 -eq 4 ]
 then
   sampleName="MUMU_FSR"
-  inputPath="/eos/user/p/pjana/RootFileTauTau/ntuples/24thAugust_mumuFSR_Arash_gUPC/gammaUPCmumuFSR/reco_mc_SC/230824_094901/0000/mc_HiForestAOD_${1}.root"
-  #outputPath="/eos/user/p/pjana/RootFileTauTau/AllSelections_FromSelectEleMuScript/mc_mumuFSR${suffix}"
-  outputPath="/eos/user/p/pjana/RootFileTauTau/AllSelections_FromSelectEleMuScript/CutFlowHistAdded_18thMarch/mc_mumuFSR${suffix}"
+#  inputPath="/eos/user/p/pjana/RootFileTauTau/ntuples/24thAugust_mumuFSR_Arash_gUPC/gammaUPCmumuFSR/reco_mc_SC/230824_094901/0000/mc_HiForestAOD_${1}.root"
+  #inputPath="/eos/user/p/pjana/RootFileTauTau/ntuples/mumu_EDFF/reco_mc_gammagammamumu_EDFF/241020_113640/0000/mc_HiForestAOD_${1}.root"
+  inputPath="/eos/user/p/pjana/RootFileTauTau/ntuples/mumu_ChFF/reco_mc_gammagammamumu_ChFF/241020_142557/0000/mc_HiForestAOD_${1}.root"
+  outputPath="/eos/user/p/pjana/RootFileTauTau/ForNEE_SF_HFonly_Study_ggmumu/mc_mumu_ChFF${suffix}"
+  #outputPath="/eos/user/p/pjana/RootFileTauTau/AllSelections_FromSelectEleMuScript/CutFlowHistAdded_18thMarch/mc_mumuFSR${suffix}"
 
 fi
 

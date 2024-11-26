@@ -100,10 +100,10 @@ ecalHEMmaxPhi: -0.9
 maxEtaEEtower:      2.4
 maxEtaHEtower:      3.0
 ### Calorimeter noise thresolds (GeV)
-noiseThresholdEB:        0.7
-noiseThresholdEE:        3.0
-noiseThresholdHB:        2.8
-noiseThresholdHE:        1.0 
+noiseThresholdEB:        999
+noiseThresholdEE:        999
+noiseThresholdHB:        999
+noiseThresholdHE:        999 
 noiseThresholdHFp:       6.0
 noiseThresholdHFm:       6.0
 

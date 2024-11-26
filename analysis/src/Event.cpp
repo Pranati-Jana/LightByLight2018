@@ -501,11 +501,13 @@ bool Event::HasAdditionalTowers()
     int ieta = eta2ieta(tower->GetEta());
 
     if(subdetHad==kHFp || subdetHad==kHFm){ // Check HF exclusivity
-      if(subdetHad==kHFp && (ieta == 29 || ieta == 30)) continue;
-      if(subdetHad==kHFm && (ieta == -29 || ieta == -30)) continue;    
-
+       if(subdetHad==kHFp && (ieta == 29 || ieta == 30 )) continue;
+       if(subdetHad==kHFm && (ieta == -29 || ieta == -30 )) continue;    
+      //  if(subdetHad==kHFp && (ieta == 29 || ieta == 30 || ieta == 31)) continue;
+      //  if(subdetHad==kHFm && (ieta == -29 || ieta == -30 || ieta == -31)) continue;   
+      // cout << "HF Eta:" << tower->GetEta() << endl;
       if(tower->GetEnergy() > config.params("noiseThreshold"+caloName.at(subdetHad))){
-       //cout << "HF Eta:" << tower->GetEta() << endl;
+      
        //cout << "HF:" << tower->GetEnergy() << endl; 
        return true;
       }
@@ -523,7 +525,7 @@ bool Event::HasAdditionalTowers()
     }
     */
     /*********************************************************************************/
-    
+    /*
     if(subdetHad==kHB){
       
      // if(IsOverlappingWithGoodMuon(*tower)) continue; //This is to only apply HE deltaR cut not on HB
@@ -545,9 +547,9 @@ bool Event::HasAdditionalTowers()
         return true;
       }
     }
-    
+    */ //NEE SF for HF only
     /*********************************************************************************/
-    
+    /*
     if(subdetEm==kEB){
       if(IsOverlappingWithGoodPhoton(*tower)) continue;
       if(IsOverlappingWithGoodElectron(*tower)) continue;
@@ -569,6 +571,7 @@ bool Event::HasAdditionalTowers()
         return true;
       }
     }
+    */ // NEE SF for HF only
 
   }
    
