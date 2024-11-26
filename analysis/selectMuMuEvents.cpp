@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
   
   auto events = make_unique<EventProcessor>(inputPath, dataset);
   
-  int trigger_passed=0, one_goodElectron=0, one_goodElectron_OneGoodMuon=0,oppositelyCharged_ElectronAndMuon=0,  twoGoodGeneralTracks=0, neutral_excl=0, acop=0;
+  int trigger_passed=0, TwoGoodMuon=0, twoGoodMuon=0,oppositelyCharged_2Muon=0,  twoGoodGeneralTracks=0, neutral_excl=0, acop=0;
   
   
   // Loop over events
@@ -280,15 +280,16 @@ int main(int argc, char* argv[])
   //  cout << "ok_singleEG3:" << ok_singleEG3 << endl;    
   //  cout << "ok_singleEG5:" << ok_singleEG5 << endl;    
     trigger_passed++;
-    
+    hist->SetBinContent(1,trigger_passed);
+
 
     if(event->GetPhysObjects(EPhysObjType::kGoodMuon).size() != 2) continue;
-    one_goodElectron++;
-    hist->SetBinContent(2,one_goodElectron);
+    TwoGoodMuon++;
+    hist->SetBinContent(2,TwoGoodMuon);
 
    // if(event->GetPhysObjects(EPhysObjType::kGoodMuon).size() != 1) continue;
-    one_goodElectron_OneGoodMuon++;
-    hist->SetBinContent(3,one_goodElectron_OneGoodMuon);
+    twoGoodMuon++;
+    hist->SetBinContent(3,twoGoodMuon);
     //
     auto Photons = event->GetPhysObjects(EPhysObjType::kGoodPhoton);
     if(Photons.size()>0) continue;
@@ -297,22 +298,14 @@ int main(int argc, char* argv[])
     auto goodMuon1 = event->GetPhysObjects(EPhysObjType::kGoodMuon)[0];
     auto goodMuon2 = event->GetPhysObjects(EPhysObjType::kGoodMuon)[1];
     if(goodMuon1->GetCharge() ==  goodMuon2->GetCharge()) continue;
-    oppositelyCharged_ElectronAndMuon++;
-    hist->SetBinContent(4,oppositelyCharged_ElectronAndMuon);
+    oppositelyCharged_2Muon++;
+    hist->SetBinContent(4,oppositelyCharged_2Muon);
  //   cout << "e charge:" << event->GetPhysObjects(EPhysObjType::kGoodElectron)[0]->GetCharge() << "mu charge:" << event->GetPhysObjects(EPhysObjType::kGoodMuon)[0]->GetCharge() << endl;
-    if(event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack).size() !=2) continue;
+   /* if(event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack).size() !=2) continue;
     twoGoodGeneralTracks++;
     hist->SetBinContent(5,twoGoodGeneralTracks);
-     
-    //if(event->HasAdditionalTowers()) continue;
-    
-    hist->SetBinContent(6,neutral_excl);
+     */
 
-   //Tower energy and eta
-   hist->SetBinContent(1,trigger_passed);  
-     //cout << "Event number:" << iEvent << endl;
-
-   
 
     nTracks = goodgenTracks.size(); 
    // extra_track_info
@@ -360,8 +353,11 @@ int main(int argc, char* argv[])
     mu2.SetPtEtaPhiM(Mu_Pt2,Mu_Eta2,Mu_Phi2,muMass);
     MuMu = mu1 + mu2;
     vSum_M = MuMu.M();
-   // if(vSum_M<8) continue;
-   // if(vSum_M>60) continue;
+    if(vSum_M<=8) continue;
+    if(vSum_M>60) continue;
+
+
+
     vSum_Pt = MuMu.Pt();
     vSum_Phi = MuMu.Phi();    
     Scalar_Pt = (Mu_Pt1 + Mu_Pt2);    
@@ -371,7 +367,16 @@ int main(int argc, char* argv[])
     vSum_Pz = MuMu.Pz();
     E_gamma1 = 0.5*vSum_M*exp(vSum_Rapidity);
     E_gamma2 = 0.5*vSum_M*exp((-1)*vSum_Rapidity);
+    
+    if(MuMu_acop > 0.02) continue;
+
+    if(event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack).size() !=2) continue;
+    twoGoodGeneralTracks++;
+    hist->SetBinContent(5,twoGoodGeneralTracks);
+    if(event->HasAdditionalTowers()) continue;
     neutral_excl++;
+    hist->SetBinContent(6,neutral_excl);
+
     /////////////////
    int ntowers = 0;
    auto towers = event->GetPhysObjects(EPhysObjType::kCaloTower);
@@ -435,9 +440,9 @@ int main(int argc, char* argv[])
   // }
   } //nevents
   Log(0) << "Number of events triggered:" << trigger_passed << "\n" ;
-  Log(0) << "One Good electron:" << one_goodElectron << "\n";
-  Log(0) << "One Good electron and one good muon:" << one_goodElectron_OneGoodMuon << "\n";
-  Log(0) << "Oppositely charged electron and muon:" << oppositelyCharged_ElectronAndMuon << "\n";
+  Log(0) << "One Good electron:" << TwoGoodMuon << "\n";
+  Log(0) << "One Good electron and one good muon:" << twoGoodMuon << "\n";
+  Log(0) << "Oppositely charged electron and muon:" << oppositelyCharged_2Muon << "\n";
   Log(0) << "Two good general tracks:" << twoGoodGeneralTracks << "\n";
   Log(0) << "Neutral exclusivity:" << neutral_excl << "\n";
   
