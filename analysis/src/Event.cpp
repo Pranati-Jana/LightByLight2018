@@ -501,10 +501,8 @@ bool Event::HasAdditionalTowers()
     int ieta = eta2ieta(tower->GetEta());
 
     if(subdetHad==kHFp || subdetHad==kHFm){ // Check HF exclusivity
-       if(subdetHad==kHFp && (ieta == 29 || ieta == 30 )) continue;
-       if(subdetHad==kHFm && (ieta == -29 || ieta == -30 )) continue;    
-      //  if(subdetHad==kHFp && (ieta == 29 || ieta == 30 || ieta == 31)) continue;
-      //  if(subdetHad==kHFm && (ieta == -29 || ieta == -30 || ieta == -31)) continue;   
+     //  if(subdetHad==kHFp && (ieta == 29 || ieta == 30 )) continue;
+     //  if(subdetHad==kHFm && (ieta == -29 || ieta == -30 )) continue;    
       // cout << "HF Eta:" << tower->GetEta() << endl;
       if(tower->GetEnergy() > config.params("noiseThreshold"+caloName.at(subdetHad))){
       
