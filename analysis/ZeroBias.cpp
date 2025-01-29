@@ -331,6 +331,7 @@ int main(int argc, char* argv[])
   TH1D *hist       = new TH1D("hist","",9,1,10);
   TH1D *hist1       = new TH1D("hist1","",9,1,10);
   TH1D *hist_wozdc = new TH1D("hist_wozdc","",9,1,10);
+  TH1D *hist_ntracks       = new TH1D("hist_ntracks","",200,0,200);
  
   TFile *outFile = TFile::Open(outputPath.c_str(), "recreate");
   TTree *genTree = new TTree("gen_tree","");
@@ -388,7 +389,7 @@ int main(int argc, char* argv[])
     ntrigger++;
    
     hist1->SetBinContent(1,ntrigger);
-   
+    //hist_ntracks->Fill(genTracks.size());
     
     run = event->GetRunNumber();
     ls = event->GetLumiSection();
