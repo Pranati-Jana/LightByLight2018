@@ -86,7 +86,11 @@ int ok_zdcexcl_5n_neg;
 int ok_zdcexcl;
 int ok_chexcl;
 int ok_chexcl_extrk;
+int ok_photon_excl;
+int ok_muon_excl;
+int ok_electron_excl;
 int nExtrk;
+int nTrack;
 float SFweight_reco[16];
 float SFweight_trig[16];
 
@@ -184,6 +188,7 @@ void InitTree(TTree *tr) {
   tr->Branch("ok_chexcl",           &ok_chexcl,       "ok_chexcl/I");
   tr->Branch("ok_chexcl_extrk",     &ok_chexcl_extrk, "ok_chexcl_extrk/I");
   tr->Branch("nExtrk",              &nExtrk,          "nExtrk/I");
+  tr->Branch("nTrack",              &nTrack,          "nTrack/I");
   tr->Branch("SFweight_reco",       SFweight_reco,    "SFweight_reco[16]/F");
   tr->Branch("SFweight_trig",       SFweight_trig,    "SFweight_trig[16]/F");
   tr->Branch("leadingEmEnergy_EB",  &leadingEmEnergy_EB,"leadingEmEnergy_EB/F");
@@ -207,7 +212,9 @@ void InitTree(TTree *tr) {
   tr->Branch("tower_etam",              &tower_etam,       "tower_etam/F");
   tr->Branch("tower_HFp",              &tower_HFp,       "tower_HFp/F");
   tr->Branch("tower_HFm",              &tower_HFm,       "tower_HFm/F");
-
+  tr->Branch("ok_muon_excl",           &ok_muon_excl,       "ok_muon_excl/I");
+  tr->Branch("ok_photon_excl",           &ok_photon_excl,       "ok_photon_excl/I");
+  tr->Branch("ok_electron_excl",           &ok_electron_excl,       "ok_electron_excl/I");
  
 }
 
@@ -275,6 +282,9 @@ void ResetVars() {
   ok_chexcl = 0;
   ok_chexcl_extrk = 0;
   nExtrk = 0;
+  ok_photon_excl = 0;
+  ok_electron_excl = 0;
+  ok_muon_excl = 0;
 
   leadingEmEnergy_EB = 0;
   leadingEmEnergy_EE = 0;
@@ -297,6 +307,7 @@ void ResetVars() {
   tower_HFp = -999;
   tower_etap = 999;
   tower_etam = -999;
+  nTrack = 0;
 
 
 }
@@ -384,12 +395,12 @@ int main(int argc, char* argv[])
     } //samplename
     
 
-  //  if(!event->HasTrigger(kZeroBias)) continue;
+    if(!event->HasTrigger(kZeroBias)) continue;
     trigger_passed++;
     ntrigger++;
    
     hist1->SetBinContent(1,ntrigger);
-    //hist_ntracks->Fill(genTracks.size());
+   
     
     run = event->GetRunNumber();
     ls = event->GetLumiSection();
@@ -397,17 +408,21 @@ int main(int argc, char* argv[])
 
     auto Electrons = event->GetPhysObjects(EPhysObjType::kGoodElectron);
     if(Electrons.size()>0) continue;
+    ok_electron_excl = (Electrons.size()) == 0 ;
      auto Photons = event->GetPhysObjects(EPhysObjType::kGoodPhoton);
     if(Photons.size()>0) continue;
+   ok_photon_excl = (Photons.size()) == 0;
     noelepho++;
     hist1->SetBinContent(2,noelepho); 
     auto genTracks = event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack);
-    if(genTracks.size() > 0) continue;
-    
+    //if(genTracks.size() > 0) continue;
+    hist_ntracks->Fill(genTracks.size());
+    nTrack = genTracks.size();
     notracks++;
     hist1->SetBinContent(3,notracks);
     auto Muons = event->GetPhysObjects(EPhysObjType::kGoodMuon);
     if(Muons.size()>0) continue;
+    ok_muon_excl = (Muons.size()) == 0;
     nomuons++;
     hist1->SetBinContent(4,nomuons);
 
@@ -415,7 +430,7 @@ int main(int argc, char* argv[])
     ok_neuexcl = (!event->HasAdditionalTowers());
     ok_HFNeeExcl = (!event->HasAdditionalHFTowers());
     ok_chexcl  = (genTracks.size()==2);
-    if(ok_neuexcl!=1) continue;
+   // if(ok_neuexcl!=1) continue;
     nonee++;
      hist1->SetBinContent(5,nonee);
 
@@ -511,7 +526,7 @@ int main(int argc, char* argv[])
  
   outFile->cd();
   hist1->Write(); 
- 
+  hist_ntracks->Write();
   outFile->Write();
   outFile->Close();
   
