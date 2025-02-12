@@ -114,6 +114,8 @@ float tower_HFp;
 float tower_HFm;
 float tower_etap;
 float tower_etam;
+float two_trk_aco;
+float two_trk_M;
 
 /// initialise gen tree
 void InitGenTree(TTree *genTree) {
@@ -215,7 +217,9 @@ void InitTree(TTree *tr) {
   tr->Branch("ok_muon_excl",           &ok_muon_excl,       "ok_muon_excl/I");
   tr->Branch("ok_photon_excl",           &ok_photon_excl,       "ok_photon_excl/I");
   tr->Branch("ok_electron_excl",           &ok_electron_excl,       "ok_electron_excl/I");
- 
+  tr->Branch("two_trk_aco",           &two_trk_aco,       "two_trk_aco/F");
+  tr->Branch("two_trk_M",           &two_trk_M,       "two_trk_M/F");
+
 }
 
 // reset gen variables
@@ -308,6 +312,8 @@ void ResetVars() {
   tower_etap = 999;
   tower_etam = -999;
   nTrack = 0;
+  two_trk_aco = 999;
+  two_trk_M = 999;
 
 
 }
@@ -358,12 +364,13 @@ int main(int argc, char* argv[])
   // Loop over events
   for(int iEvent=0; iEvent<events->GetNevents(); iEvent++){
  
-  // if(iEvent>=10000) continue;
-	  if(iEvent%10000 == 0) Log(0)<<"Processing event "<<iEvent<<"\n";
+  // if(iEvent>20000) continue;
+	  //if(iEvent%5000000000 == 0) Log(0)<<"Processing event "<<iEvent<<"\n";
     //if(iEvent >= config.params("maxEvents")) break;
    
     auto event = events->GetEvent(iEvent);
-    
+    //cout << "Event no.:" <<event->GetEventNumber() << endl;
+
     ResetGenVars();  
     ResetVars();  
     if(sampleName == "QED_SC"  || sampleName == "QED_SL" ){
@@ -414,23 +421,60 @@ int main(int argc, char* argv[])
    ok_photon_excl = (Photons.size()) == 0;
     noelepho++;
     hist1->SetBinContent(2,noelepho); 
-    auto genTracks = event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack);
-    //if(genTracks.size() > 0) continue;
-    hist_ntracks->Fill(genTracks.size());
-    nTrack = genTracks.size();
-    notracks++;
-    hist1->SetBinContent(3,notracks);
     auto Muons = event->GetPhysObjects(EPhysObjType::kGoodMuon);
     if(Muons.size()>0) continue;
     ok_muon_excl = (Muons.size()) == 0;
     nomuons++;
     hist1->SetBinContent(4,nomuons);
 
+    auto genTracks = event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack);
+    if(genTracks.size() != 2) continue;
+    hist_ntracks->Fill(genTracks.size());
+    notracks++;
+    hist1->SetBinContent(3,notracks);
+     auto trk1 = event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack)[0];
+     auto trk2 = event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack)[1];
+     double trk1_pt = trk1->GetPt();
+     double trk2_pt = trk2->GetPt();
+     double trk1_phi = trk1->GetPhi();
+     double trk2_phi = trk2->GetPhi();
+     double trk1_eta = trk1->GetEta();
+     double trk2_eta = trk2->GetEta();
+    //  double trk1_E = trk1->GetEnergy();
+    
+    //  double trk2_E = trk2->GetEnergy();
+     double trk_dPhi = getDPHI(trk1_phi,trk2_phi);
+     two_trk_aco = 1 - (trk_dPhi/3.141592653589); 
+     if((trk1->GetCharge()) == (trk2->GetCharge())) continue;
+     if(trk1_pt < 2 && trk2_pt < 2) continue;
+     if(two_trk_aco > 0.1) continue;
+     double Mass = 139.57039e-3;
+    TLorentzVector tk1, tk2, tktk;
+    tk1.SetPtEtaPhiM(trk1_pt,trk1_eta,trk1_phi,Mass);
+    tk2.SetPtEtaPhiM(trk2_pt,trk2_eta,trk2_phi,Mass);
+    tktk = tk1 + tk2;
+    two_trk_M = tktk.M();
+
+     nTrack = genTracks.size();
+    
+
+    cout << "nTrack:" <<  nTrack << endl;
+    double nTrack_pt = 0;
+    double max_trk_pt = -1;
+    for (auto trks:genTracks){
+    double trk_pt = trks->GetPt();
+    //cout << "Track pts:" << trk_pt << endl;
+    if(trk_pt>max_trk_pt){
+      max_trk_pt = trk_pt;
+    }
+    cout << "Max trk pt:" << max_trk_pt << endl;
+
+    }
+
 
     ok_neuexcl = (!event->HasAdditionalTowers());
     ok_HFNeeExcl = (!event->HasAdditionalHFTowers());
     ok_chexcl  = (genTracks.size()==2);
-   // if(ok_neuexcl!=1) continue;
     nonee++;
      hist1->SetBinContent(5,nonee);
 
