@@ -9,6 +9,7 @@
 #include "Logger.hpp"
 #include "TLorentzVector.h"
 #include "Event.hpp"
+#include "retrieve_LumiInfo.h"
 
 int ireg(double et, double eta);
 double SF_reco(double et, double eta);
@@ -46,10 +47,13 @@ float Gen_vSum_Rapidity;
 float Gen_EleMu_dphi;
 float Gen_EleMu_acop;
 int   EleMuEvents;
+int hasMuon;
 
 float Tau_Pt2;
 float Tau_Eta2;
 float Tau_Phi2;
+float TauTau_vSum_M;
+float TauTau_vSum_Rapidity;
 //
 int run;
 int ls;
@@ -85,6 +89,7 @@ int ok_chexcl_tracks;
 int ok_chexcl_goodtracks;
 int ok_trigger;
 int   nTracks;
+int ok_neuexcl_HFonly;
 ///initialise gen tree
 void InitGenTree(TTree *genTree) {
   genTree->Branch("Tau_Pt",                 &Tau_Pt,           "Tau_Pt/F");
@@ -115,6 +120,10 @@ void InitGenTree(TTree *genTree) {
   genTree->Branch("Gen_EleMu_dphi",          &Gen_EleMu_dphi,   "Gen_EleMu_dphi/F");
   genTree->Branch("Gen_EleMu_acop",          &Gen_EleMu_acop,   "Gen_EleMu_acop/F");
   genTree->Branch("EleMuEvents",             &EleMuEvents,      "EleMuEvents/I");
+  genTree->Branch("EleMuEvents",             &EleMuEvents,      "EleMuEvents/I");
+  genTree->Branch("hasMuon",                 &hasMuon,      "hasMuon/I");
+  genTree->Branch("TauTau_vSum_Rapidity",       &TauTau_vSum_Rapidity,"TauTau_vSum_Rapidity/F");
+  genTree->Branch("TauTau_vSum_M",       &TauTau_vSum_M,"TauTau_vSum_M/F");
 
 }
 
@@ -149,6 +158,9 @@ void InitTree(TTree *tr) {
   tr->Branch("Gen_EleMu_dphi",          &Gen_EleMu_dphi,   "Gen_EleMu_dphi/F");
   tr->Branch("Gen_EleMu_acop",          &Gen_EleMu_acop,   "Gen_EleMu_acop/F");
   tr->Branch("EleMuEvents",             &EleMuEvents,      "EleMuEvents/I");
+  tr->Branch("hasMuon",                 &hasMuon,          "hasMuon/I");
+  tr->Branch("TauTau_vSum_Rapidity",       &TauTau_vSum_Rapidity,"TauTau_vSum_Rapidity/F");
+  tr->Branch("TauTau_vSum_M",       &TauTau_vSum_M,"TauTau_vSum_M/F");
 ////
   tr->Branch("run",                 &run,           "run/I");
   tr->Branch("ls",                  &ls,            "ls/I");
@@ -175,7 +187,7 @@ void InitTree(TTree *tr) {
   tr->Branch("EleMu_dphi",          &EleMu_dphi,   "EleMu_dphi/F");
   tr->Branch("EleMu_acop",          &EleMu_acop,   "EleMu_acop/F");
   tr->Branch("ok_neuexcl",          &ok_neuexcl,   "ok_neuexcl/I");
-  
+  tr->Branch("ok_neuexcl_HFonly",          &ok_neuexcl_HFonly,   "ok_neuexcl_HFonly/I");
 
   tr->Branch("ok_chexcl",           &ok_chexcl,       "ok_chexcl/I");
   tr->Branch("ok_chexcl_tracks",           &ok_chexcl_tracks,       "ok_chexcl_tracks/I");
@@ -206,9 +218,12 @@ void ResetGenVars() {
  Gen_EleMu_dphi = -999;
  Gen_EleMu_acop = -999;
  EleMuEvents = 0;
+ hasMuon = 0;
   Tau_Pt2 = -999;
   Tau_Eta2 = -999;
   Tau_Phi2 = -999;
+  TauTau_vSum_M = -999;
+  TauTau_vSum_Rapidity = -999;
 
 }
 
@@ -241,6 +256,7 @@ void ResetVars() {
   ok_chexcl_tracks = 0;
   ok_chexcl_goodtracks = 0;
   ok_trigger = 0;
+  ok_neuexcl_HFonly = 0;
 }
 
 
@@ -275,7 +291,6 @@ int main(int argc, char* argv[])
   TTree *tr = new TTree("output_tree","");
   InitTree(tr);
 
-  
   auto events = make_unique<EventProcessor>(inputPath, dataset);
   
   int trigger_passed=0, twoPho=0, twoGoodPho=0, oppCharge=0, neutral_excl=0, charged_excl=0, diphomass_wozdc=0, diphopt_wozdc=0;
@@ -284,45 +299,51 @@ int main(int argc, char* argv[])
   // Loop over events
   for(int iEvent=0; iEvent<events->GetNevents(); iEvent++){
   //for(int iEvent=0; iEvent<1000; iEvent++){
-    if(iEvent%1000 == 0) Log(0)<<"Processing event "<<iEvent<<"\n";
-    //if(iEvent >= config.params("maxEvents")) break;
-    
+    if(iEvent%50000 == 0) Log(0)<<"Processing event "<<iEvent<<"\n";
+   // if(iEvent > 20) continue;
     auto event = events->GetEvent(iEvent);
     ResetGenVars();  
     ResetVars();
-    if(sampleName == "QED_SC"){
-
-//     ResetGenVars();  
+    if(sampleName == "GAMMA_UPC"){
 
      auto gen = event->GetPhysObjects(EPhysObjType::kGenParticle);
    // cout << "gen size:" << gen.size() << endl;
     auto GenTaus_1 = event->GetPhysObjects(EPhysObjType::kGenParticle)[0];
     auto GenTaus_2 = event->GetPhysObjects(EPhysObjType::kGenParticle)[1];
-    //  cout << "gen PID1:" << GenTaus_1->GetPID() << endl;
+    // cout << "gen PID1:" << GenTaus_1->GetPID() << endl;
     // cout << "gen Pt1:" << GenTaus_1->GetPt() << endl;
     // cout << "gen PID2:" << GenTaus_2->GetPID() << endl;
     // cout << "gen Pt2:" << GenTaus_2->GetPt() << endl;
     auto genDau = event->GetPhysObjects(EPhysObjType::kGenParticleTauDaughter);
         // cout << "genDau size:" << genDau.size() << endl;
-
     auto GenTausD_1 = event->GetPhysObjects(EPhysObjType::kGenParticleTauDaughter)[0];
     auto GenTausD_2 = event->GetPhysObjects(EPhysObjType::kGenParticleTauDaughter)[1];
-   // auto GenTausD_3 = event->GetPhysObjects(EPhysObjType::kGenParticleTauDaughter)[2];
-   // auto GenTausD_4 = event->GetPhysObjects(EPhysObjType::kGenParticleTauDaughter)[3];
+    //auto GenTausD_3 = event->GetPhysObjects(EPhysObjType::kGenParticleTauDaughter)[2];
+   //auto GenTausD_4 = event->GetPhysObjects(EPhysObjType::kGenParticleTauDaughter)[3];
 
     ResetGenVars();
+     double TauMass = 1.7;
+    TLorentzVector Tau1, Tau2, TauTau;
+    double Tau1_Pt = GenTaus_1->GetPt();
+    double Tau2_Pt = GenTaus_2->GetPt();
+    double Tau1_Eta = GenTaus_1->GetEta();
+    double Tau2_Eta = GenTaus_2->GetEta();
+    double Tau1_Phi = GenTaus_1->GetPhi();
+    double Tau2_Phi = GenTaus_2->GetPhi();
 
+    Tau1.SetPtEtaPhiM(Tau1_Pt,Tau1_Eta,Tau1_Phi,TauMass);
+    Tau2.SetPtEtaPhiM(Tau2_Pt,Tau2_Eta,Tau2_Phi,TauMass);
+    TauTau = Tau1 + Tau2;
+    TauTau_vSum_M = TauTau.M();
+    TauTau_vSum_Rapidity = TauTau.Rapidity();
 
-   
-    
-    bool hasMuon = false;
+    bool hasMuon1 = false;
     bool hasElectron = false;
     for(auto TauD : genDau){
        int  TauD_PID = TauD->GetPID();
-      // cout << "TauD PID:" << TauD_PID << endl;
-       if((TauD_PID == -13 && TauD_PID == -11) || (TauD_PID == 13 && TauD_PID == 11)) continue;
        if(abs(TauD_PID) == 13){
-        hasMuon = true;
+        hasMuon1 = true;
+        hasMuon = 1;
         Gen_Mu_Pt = TauD->GetPt();
         Gen_Mu_Eta = TauD->GetEta();
         Gen_Mu_Phi = TauD->GetPhi();
@@ -336,9 +357,10 @@ int main(int argc, char* argv[])
         }
      }
 
-     EleMuEvents = hasMuon && hasElectron;
+
+     EleMuEvents = hasMuon1 && hasElectron;
      if ( EleMuEvents ) {
-        cout << "EleMu Events:::::::::::::::::::::::::::::::::::::::::" << EleMuEvents << endl;
+        //cout << "EleMu Events:::::::::::::::::::::::::::::::::::::::::" << EleMuEvents << endl;
         double eleMass = 0.5109989461e-3;
         double muMass = 105.6583755e-3;
         TLorentzVector ele, mu, EleMu;
@@ -346,40 +368,26 @@ int main(int argc, char* argv[])
         mu.SetPtEtaPhiM(Gen_Mu_Pt,Gen_Mu_Eta,Gen_Mu_Phi,muMass);
         EleMu = ele + mu;
         Gen_vSum_M = EleMu.M();
-       // cout << "Gen_vSum_M" << Gen_vSum_M << endl;
         Gen_vSum_Pt = EleMu.Pt();
         Gen_vSum_Phi = EleMu.Phi();
         Gen_Scalar_Pt = (Gen_Ele_Pt + Gen_Mu_Pt);
         Gen_vSum_Rapidity = EleMu.Rapidity();
         Gen_EleMu_dphi = getDPHI(Gen_Ele_Phi,Gen_Mu_Phi);
-       // cout << "Gen dPhi:" << Gen_EleMu_dphi << endl;
-        Gen_EleMu_acop = 1 - (Gen_EleMu_dphi/3.141592653589);
-        // cout << "Ele Pt:" << Gen_Ele_Pt << endl;
-        // cout << "Ele Eta:" << Gen_Ele_Eta << endl;
-        // cout << "Ele Phi:" << Gen_Ele_Phi << endl;
-        // cout << "Mu Pt:" << Gen_Mu_Pt << endl;
-        // cout << "Mu Eta:" << Gen_Mu_Eta << endl;
-        // cout << "Mu Phi:" << Gen_Mu_Phi << endl;
-        // cout << " Gen_EleMu_acop : " <<  Gen_EleMu_acop << endl;
+        Gen_EleMu_acop = 1 - (Gen_EleMu_dphi/3.141592653589); 
          
         }
-
       for(auto Taus : gen){
       Tau_Pt  = Taus->GetPt();
       Tau_Eta = Taus->GetEta();
       Tau_Phi = Taus->GetPhi();
       Tau_E   = Taus->GetEnergy();
-     // cout << "TauPt:" << Tau_Pt << endl;
-    // cout << "Tau PID:" << Taus->GetPID() << endl;
        for(auto TauD : genDau){
         if(EleMuEvents){
         if(Taus->GetPID() * TauD->GetPID() == 195){
-         cout << "Tau PID:" << Taus->GetPID() << endl;
-           cout << "Tau Dauther PID:" << TauD->GetPID() << endl;
-         cout << "Tau Pt decay to muon:" << Taus->GetPt() << endl;
         Tau_Pt2 = Taus->GetPt();
         Tau_Eta2 = Taus->GetEta();
         Tau_Phi2 = Taus->GetPhi();
+
       }
         }
        }
@@ -390,22 +398,20 @@ int main(int argc, char* argv[])
     //
     //cout <<"After trigger "<<iEvent<<"\n";
     ok_trigger = ((event->HasTrigger(kSingleMuOpenNoHF)) or (event->HasTrigger(kSingleEG5noHF)));     
-    //ok_trigger = (event->HasTrigger(kSingleMuOpenNoHF));     
-    //if(!event->HasTrigger(kSingleMuOpenNoHF)) continue;
-   // trigger_passed++;
-  // hist->SetBinContent(1,trigger_passed);
-   // cout << "Trigger" << ok_trigger <<  endl; 
-    //cout << "Test1:" << endl; 
+   
+    SQLLumiDB::initializeDB("/eos/user/p/pjana/Lumi_Run_LS/ratemon/TestTriggerRates.db");
     run = event->GetRunNumber();
     ls = event->GetLumiSection();
     evtnb = event->GetEventNumber();
+    double LINST = SQLLumiDB::GetLumiValue(run, ls);
+    double RATE_ZB = SQLLumiDB::GetLumiValue(run,ls,"RATE_ZB");
     //cout << "Test2:" << endl;
    // twoPho++; 
 ////////
     if((event->GetPhysObjects(EPhysObjType::kGoodElectron).size() == 1) && (event->GetPhysObjects(EPhysObjType::kGoodMuon).size() == 1) && (event->GetPhysObjects(EPhysObjType::kGoodGeneralTrack).size() == 2)){
     
    // if(event->GetPhysObjects(EPhysObjType::kGoodElectron).size() != 1) continue;
-    cout << "Test3:" << endl;
+   // cout << "Test3:" << endl;
    // if(event->GetPhysObjects(EPhysObjType::kGoodMuon).size() == 1){ 
    // if(event->GetPhysObjects(EPhysObjType::kGoodMuon).size() != 1) continue;
    /*
@@ -429,7 +435,7 @@ int main(int argc, char* argv[])
     
     //ok_chexcl_tracks = (genTracks.size()==0);
      ok_chexcl_goodtracks = (goodgenTracks.size()==2);
-
+     ok_neuexcl_HFonly = (!event->HasAdditionalHFTowers(LINST));
 //    nTracks  = genTracks.size();
 
     
