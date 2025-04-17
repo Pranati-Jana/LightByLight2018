@@ -47,7 +47,10 @@ float Gen_vSum_Rapidity;
 float Gen_EleMu_dphi;
 float Gen_EleMu_acop;
 int   EleMuEvents;
-int hasMuon;
+int   hasMuon;
+int   Mu1ProngEvents;
+int   Mu3ProngEvents;
+int   Ele3ProngEvents;
 
 float Tau_Pt2;
 float Tau_Eta2;
@@ -120,7 +123,9 @@ void InitGenTree(TTree *genTree) {
   genTree->Branch("Gen_EleMu_dphi",          &Gen_EleMu_dphi,   "Gen_EleMu_dphi/F");
   genTree->Branch("Gen_EleMu_acop",          &Gen_EleMu_acop,   "Gen_EleMu_acop/F");
   genTree->Branch("EleMuEvents",             &EleMuEvents,      "EleMuEvents/I");
-  genTree->Branch("EleMuEvents",             &EleMuEvents,      "EleMuEvents/I");
+  genTree->Branch("Mu1ProngEvents",             &Mu1ProngEvents,      "Mu1ProngEvents/I");
+  genTree->Branch("Mu3ProngEvents",             &Mu3ProngEvents,      "Mu3ProngEvents/I");
+  genTree->Branch("Ele3ProngEvents",             &Ele3ProngEvents,      "Ele3ProngEvents/I");
   genTree->Branch("hasMuon",                 &hasMuon,      "hasMuon/I");
   genTree->Branch("TauTau_vSum_Rapidity",       &TauTau_vSum_Rapidity,"TauTau_vSum_Rapidity/F");
   genTree->Branch("TauTau_vSum_M",       &TauTau_vSum_M,"TauTau_vSum_M/F");
@@ -158,6 +163,9 @@ void InitTree(TTree *tr) {
   tr->Branch("Gen_EleMu_dphi",          &Gen_EleMu_dphi,   "Gen_EleMu_dphi/F");
   tr->Branch("Gen_EleMu_acop",          &Gen_EleMu_acop,   "Gen_EleMu_acop/F");
   tr->Branch("EleMuEvents",             &EleMuEvents,      "EleMuEvents/I");
+  tr->Branch("Mu1ProngEvents",             &Mu1ProngEvents,      "Mu1ProngEvents/I");
+  tr->Branch("Mu3ProngEvents",             &Mu3ProngEvents,      "Mu3ProngEvents/I");
+  tr->Branch("Ele3ProngEvents",             &Ele3ProngEvents,      "Ele3ProngEvents/I");
   tr->Branch("hasMuon",                 &hasMuon,          "hasMuon/I");
   tr->Branch("TauTau_vSum_Rapidity",       &TauTau_vSum_Rapidity,"TauTau_vSum_Rapidity/F");
   tr->Branch("TauTau_vSum_M",       &TauTau_vSum_M,"TauTau_vSum_M/F");
@@ -218,6 +226,9 @@ void ResetGenVars() {
  Gen_EleMu_dphi = -999;
  Gen_EleMu_acop = -999;
  EleMuEvents = 0;
+ Mu1ProngEvents = 0;
+ Mu3ProngEvents = 0;
+ Ele3ProngEvents = 0;
  hasMuon = 0;
   Tau_Pt2 = -999;
   Tau_Eta2 = -999;
@@ -299,8 +310,8 @@ int main(int argc, char* argv[])
   // Loop over events
   for(int iEvent=0; iEvent<events->GetNevents(); iEvent++){
   //for(int iEvent=0; iEvent<1000; iEvent++){
-    if(iEvent%50000 == 0) Log(0)<<"Processing event "<<iEvent<<"\n";
-   // if(iEvent > 20) continue;
+    if(iEvent%500000 == 0) Log(0)<<"Processing event "<<iEvent<<"\n";
+    //if(iEvent > 24) continue;
     auto event = events->GetEvent(iEvent);
     ResetGenVars();  
     ResetVars();
@@ -339,8 +350,11 @@ int main(int argc, char* argv[])
 
     bool hasMuon1 = false;
     bool hasElectron = false;
+    bool hasOnePion = false;
+    int count_211 = 0;
     for(auto TauD : genDau){
        int  TauD_PID = TauD->GetPID();
+       //cout << "TauD_PID:"  << TauD_PID << endl;
        if(abs(TauD_PID) == 13){
         hasMuon1 = true;
         hasMuon = 1;
@@ -355,9 +369,22 @@ int main(int argc, char* argv[])
         Gen_Ele_Phi = TauD->GetPhi();
         Gen_Ele_E = TauD->GetEnergy();
         }
+      else if(abs(TauD_PID) == 211){
+        hasOnePion = true;
+        count_211++;
+        }
      }
-
-
+     
+     //cout << "Number of TauD_PID == 211: " << count_211 << endl;
+     Mu1ProngEvents = hasMuon1 && count_211==1;
+     //cout << "Mu1ProngEvents:" << Mu1ProngEvents << endl;
+     Mu3ProngEvents = hasMuon1 && count_211==3;
+     //cout << "Mu3ProngEvents:" << Mu3ProngEvents << endl;
+     Ele3ProngEvents = hasElectron && count_211==3;
+     //cout << "Ele3ProngEvents:" << Ele3ProngEvents << endl;
+     if(Ele3ProngEvents==1){
+     // cout << "Ele Pt:" << Gen_Ele_Pt << endl;
+     }
      EleMuEvents = hasMuon1 && hasElectron;
      if ( EleMuEvents ) {
         //cout << "EleMu Events:::::::::::::::::::::::::::::::::::::::::" << EleMuEvents << endl;
@@ -382,6 +409,7 @@ int main(int argc, char* argv[])
       Tau_Phi = Taus->GetPhi();
       Tau_E   = Taus->GetEnergy();
        for(auto TauD : genDau){
+        //cout << "Gen D PID:" << TauD->GetPID() << endl;
         if(EleMuEvents){
         if(Taus->GetPID() * TauD->GetPID() == 195){
         Tau_Pt2 = Taus->GetPt();
@@ -403,8 +431,8 @@ int main(int argc, char* argv[])
     run = event->GetRunNumber();
     ls = event->GetLumiSection();
     evtnb = event->GetEventNumber();
-    double LINST = SQLLumiDB::GetLumiValue(run, ls);
-    double RATE_ZB = SQLLumiDB::GetLumiValue(run,ls,"RATE_ZB");
+     double LINST = SQLLumiDB::GetLumiValue(run, ls);
+    // double RATE_ZB = SQLLumiDB::GetLumiValue(run,ls,"RATE_ZB");
     //cout << "Test2:" << endl;
    // twoPho++; 
 ////////
